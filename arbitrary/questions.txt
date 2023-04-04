@@ -1,0 +1,7 @@
+Frågor:
+    1. Hur olikt är django flask?
+
+    2. Är min kravspecifikation nog?
+    
+    3. Hur kan man lagra personlig data på något bra sätt? Finns det någon
+    tjänst för det?
