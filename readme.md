@@ -20,4 +20,4 @@ the assumption that the user browse this app on his/her phone most of the time.
 Svelte, Typescript, Oauth 2.0, Boostrap
 
 ## Back-end 
-Expressjs
+Expressjs, mysql
