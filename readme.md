@@ -13,10 +13,10 @@ the assumption that the user browse this app on his/her phone most of the time.
 1. settings (name, profile icon, age, etc.)
 1. Sign in / log-out
 1. add / delete monitoring of a pump
+1. Dark mode
+1. Use https
 
 # tech stack:
-
-Use https to communicate with server
 
 ## Front-end 
 Svelte, Typescript, Oauth 2.0, Boostrap
@@ -26,3 +26,37 @@ Expressjs (Typescript if possible), mysql
 
 ## Dev tools
 nodemon(?), Vite(?)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
