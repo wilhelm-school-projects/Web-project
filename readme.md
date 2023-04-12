@@ -16,8 +16,13 @@ the assumption that the user browse this app on his/her phone most of the time.
 
 # tech stack:
 
+Use https to communicate with server
+
 ## Front-end 
 Svelte, Typescript, Oauth 2.0, Boostrap
 
 ## Back-end 
-Expressjs, mysql
+Expressjs (Typescript if possible), mysql
+
+## Dev tools
+nodemon(?), Vite(?)
