@@ -1,11 +1,11 @@
 {
     "compilerOptions" : {
+        "outDir": "typescript_outdir",
         "module": "commonjs",
         "esModuleInterop": true,
         "target": "es6",
         "moduleResolution": "node",
         "sourceMap": true,
-        "outDir": "typescript_outdir"
 
     },
     "lib": ["es2015"]
