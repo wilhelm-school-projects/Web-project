@@ -25,7 +25,7 @@ Svelte, Typescript, Oauth 2.0, Boostrap
 Expressjs (Typescript if possible), mysql
 
 ## Dev tools
-nodemon(?), Vite(?)
+nodemon(?), Vite (Kör live server för svelte och bygger projekt),
 
 
 

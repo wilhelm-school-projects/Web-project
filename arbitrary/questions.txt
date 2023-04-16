@@ -1,7 +1,9 @@
 Frågor:
-    1. Hur olikt är django flask?
+    *   Cors error när jag kör i firefox, vad kan det bero på? Jag tillåter windows certifikat
 
-    2. Är min kravspecifikation nog?
-    
-    3. Hur kan man lagra personlig data på något bra sätt? Finns det någon
-    tjänst för det?
+    *   Hur kan man lagra personlig data på något bra sätt? Finns det någon
+        tjänst för det?
+
+    * 	(Simon) hur mycket tid la du ner på projektet?
+
+    * 	Hur ändrar man till "localhost" i auth0?

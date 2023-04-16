@@ -1,0 +1,1 @@
+npm run dev -- --port 7331 --host
