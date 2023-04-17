@@ -1,3 +1,7 @@
-# TODO: finish this script
+# TODO: finish this script (finished?)
+
+
 npx tsc src/server.ts
-cp typescript_outdir/server.js public/
+
+DEBUG=express:* node src/server.js
+# node src/server.js
