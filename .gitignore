@@ -2,3 +2,4 @@
 node_modules
 typescript_outdir
 server.js
+.editorconfig

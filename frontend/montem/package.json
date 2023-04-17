@@ -21,6 +21,7 @@
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.0.4",
     "bootstrap": "^5.2.3",
+    "svelte-spa-router": "^3.3.0",
     "vite-plugin-mkcert": "^1.14.0"
   }
 }
