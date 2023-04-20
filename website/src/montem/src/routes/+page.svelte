@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createAuth0Client } from '@auth0/auth0-spa-js';
+	import { slide, fade } from 'svelte/transition';
 	let isDisabled: boolean = false;
 
 	// AUTH0_BEGIN
@@ -62,14 +63,15 @@
 	// initAuth0();
 </script>
 
-<div id="not-logged-in-container">
+<!-- transition:slide={{ axis: 'x', duration: 700 }} -->
+<main in:slide={{ axis: 'x', duration: 700 }} out:fade>
 	<div id="header" class="row">
 		<div class="col d-flex justify-content-center">
 			<h1 class="h1">Montem!</h1>
 		</div>
 	</div>
 	<div class="row">
-		<div id="left-col" class="col-2">Left</div>
+		<div id="left-col" class="col-2 border" />
 		<div id="main-col" class="col">
 			<form class="">
 				<label for="">Sign in</label>
@@ -77,9 +79,9 @@
 				<input type="" class="rounded" />
 			</form>
 		</div>
-		<div id="right-col" class="col-2">Right</div>
+		<div id="right-col" class="col-2 border" />
 	</div>
-</div>
+</main>
 
 <style>
 </style>

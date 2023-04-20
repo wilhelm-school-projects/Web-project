@@ -1,6 +1,5 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/kit/vite';
-
 // This might be useful if index isn't served to client!
 // 	
 //	You must ensure SvelteKit's
