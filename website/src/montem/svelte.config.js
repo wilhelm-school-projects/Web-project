@@ -22,14 +22,30 @@ const config = {
 	// 	adapter: adapter()
 	// }
 	kit: {
+        prerender:{
+            // För att lyckas prerendra [type] måste jag specificera att dessa
+            // två dynamiska routes ska göras explicit. Då måste jag i root
+            // +layout.js säga att prerender=false, för annars klagar den på:  
+            //
+            //"Error: The following routes were marked as prerenderable, but
+            //were not prerendered because they were not found while crawling
+            //your app:
+            //- /,  - /game,  - /home,  - /home/settings"
+            //
+            // Om jag dock tar bort entries nedan, kan jag säga prerender=true i
+            // root. Detta förstår jag inte riktigt hur det funkar?. (jag måste
+            // också säga i +page.js för [type] att prerender=true, men det
+            // förståeligt tror tycker jag.)
+            entries:['/game/host', '/game/client'],
+        },
         adapter: adapter({
             // default options are shown. On some platforms
             // these options are set automatically — see below
             pages: 'build',
             assets: 'build',
-            fallback: null,
             precompress: false,
-            strict: true
+            strict: true,
+            fallback: 'index.html'
         })
     }
 };

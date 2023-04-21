@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Navbar from '$lib/Navbar.svelte';
-	let paths: string[] = ['/home', '/game', '/game'];
-	let texts: string[] = ['Home', '', 'Logout'];
+	let paths: string[] = ['/home', '/game/host', '/game/client'];
+	let texts: string[] = ['Home', 'host', 'client'];
 </script>
 
 <main>

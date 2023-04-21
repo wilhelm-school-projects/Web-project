@@ -1,7 +1,7 @@
 // "typescript"
 
 const PORT : number = 7331;
-const INDEX_PATH    = __dirname + '/frontend/dist';
+const INDEX_PATH    = __dirname + '/montem/build';
 
 const { exec } = require('child_process');  //  { exec } betyder att ta ut objectet (eller funktionen?) från ett object eller array. 
                                             //  Det är alltså samma som "const exec = require('child_process').exec;"
@@ -17,7 +17,7 @@ const path = require('path');   //    Path is used to handle paths for resources
                                 //     if a written path is faulty. Which wouldn't
                                 //     been as easy if it wasn't used.
 
-app.use('/', express.static( path.join(__dirname, '/frontend/dist') ) );
+app.use('/', express.static( path.join(__dirname, '/montem/build') ) );
 
 app.listen(PORT, () => {
     console.log("We're listening!");
