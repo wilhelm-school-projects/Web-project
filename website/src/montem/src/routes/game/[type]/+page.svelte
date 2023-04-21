@@ -7,6 +7,7 @@
 	<div class="row">
 		<h1 class="text-center col">Paint</h1>
 	</div>
+	<!-- Should make a Canvas component -->
 	{path}
 </main>
 

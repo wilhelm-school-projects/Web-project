@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Navbar from '$lib/Navbar.svelte';
+	import Navbar from '$lib/components/Navbar.svelte';
 	let paths: string[] = ['/home', '/game/host', '/game/client'];
 	let texts: string[] = ['Home', 'host', 'client'];
 </script>
@@ -11,14 +11,6 @@
 </main>
 
 <Navbar {paths} {texts} />
-
-<!-- 
-function initCanvas() {
-        console.log('init canvas!');
-    } 
-<div class="row">
-	<canvas class="bg-danger" on:load={initCanvas}> hej </canvas>
-</div> -->
 
 <style>
 </style>
