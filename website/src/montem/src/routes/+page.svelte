@@ -64,7 +64,7 @@
 </script>
 
 <!-- transition:slide={{ axis: 'x', duration: 700 }} -->
-<main in:slide={{ axis: 'x', duration: 700 }} out:fade>
+<main in:slide={{ axis: 'x', duration: 700 }}>
 	<div id="header" class="row">
 		<div class="col d-flex justify-content-center">
 			<h1 class="h1">Montem!</h1>

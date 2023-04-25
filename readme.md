@@ -15,6 +15,7 @@ the assumption that the user browse this app on his/her phone most of the time.
 1. add / delete monitoring of a pump
 1. Dark mode
 1. Use https
+1. Multiple languages
 
 # tech stack:
 
