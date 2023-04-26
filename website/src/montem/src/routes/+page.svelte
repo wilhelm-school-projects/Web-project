@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { createAuth0Client } from '@auth0/auth0-spa-js';
 	import { slide, fade } from 'svelte/transition';
-	let isDisabled: boolean = false;
+
+	let isdisabled: boolean = false;
 
 	// AUTH0_BEGIN
 	//  The domain and clientid should in deployement be fetched from my server.
