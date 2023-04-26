@@ -1,4 +1,6 @@
 // TODO: put database stuff in seperate file
+// TODO: connect to databas
+// TODO: create table in databas
 
 const PORT: number = 7331;
 const INDEX_PATH = __dirname + '/montem/build';
