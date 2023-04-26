@@ -1,12 +1,7 @@
 // "typescript"
 
-<<<<<<< HEAD
 const PORT: number = 7331;
-const INDEX_PATH = __dirname + '/frontend/dist';
-=======
-const PORT : number = 7331;
-const INDEX_PATH    = __dirname + '/montem/build';
->>>>>>> 6847b9e229519b4f587db5ecd9d2b9a0df28d250
+const INDEX_PATH = __dirname + '/montem/build';
 
 require('dotenv').config();
 const { exec } = require('child_process');  //  { exec } betyder att ta ut objectet (eller funktionen?) från ett object eller array. 
@@ -23,11 +18,7 @@ const path = require('path');   //    Path is used to handle paths for resources
 //     if a written path is faulty. Which wouldn't
 //     been as easy if it wasn't used.
 
-<<<<<<< HEAD
-app.use('/', express.static(path.join(__dirname, '/frontend/dist')));
-=======
-app.use('/', express.static( path.join(__dirname, '/montem/build') ) );
->>>>>>> 6847b9e229519b4f587db5ecd9d2b9a0df28d250
+app.use('/', express.static(path.join(__dirname, '/montem/build')));
 
 app.listen(PORT, () => {
     console.log("We're listening!");
