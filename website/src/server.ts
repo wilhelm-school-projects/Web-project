@@ -20,6 +20,9 @@ const path = require('path');   //    Path is used to handle paths for resources
 
 app.use('/', express.static(path.join(__dirname, '/montem/build')));
 
+
+
+
 app.listen(PORT, () => {
     console.log("We're listening!");
 });
