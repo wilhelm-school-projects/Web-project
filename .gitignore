@@ -4,3 +4,4 @@ typescript_outdir
 server.js
 .editorconfig
 .env
+functions
