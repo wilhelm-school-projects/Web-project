@@ -1,7 +1,7 @@
 // H
 // https://stackoverflow.com/questions/50918961/serve-html-file-using-firebase-function
 import * as functions from "firebase-functions";
-// import { Request, Response } from 'express';
+import { Request, Response } from 'express';
 
 const PORT: number = 7331;
 // const INDEX_PATH = __dirname + '/montem/build';
@@ -43,11 +43,9 @@ const express = require('express');
 const app = express();
 // const path = require('path');
 
-// app.use('/', express.static(path.join(__dirname, '/montem/build')));
-app.use('/', express.static('frontend/build'));
-// app.get('/', (req: Request, res: Response) => {
-//     res.send('Hello world!');
-// });
+app.get('/', (req: Request, res: Response) => {
+    res.send('Hello world!');
+});
 
 
 app.listen(PORT, () => {
