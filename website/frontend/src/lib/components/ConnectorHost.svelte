@@ -1,10 +1,16 @@
 <script lang="ts">
     import { Host } from "$lib/modules/ConnectToCanvas";
+    let host: Host = new Host();
+    let canvasRoute: string = "/game/host";
+    let canvasName: string = "";
 
     function connectToCanvas() {
-        console.log(canvasName);
+        if (host.establishCanvas(canvasName)) {
+            host.navigateTo(canvasRoute);
+        } else {
+            console.log("Canvas already exists");
+        }
     }
-    let canvasName: string = "";
 </script>
 
 <main>

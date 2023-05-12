@@ -45,19 +45,6 @@
 					>
 						Connect
 					</button>
-					<!-- <a
-						type="button"
-						class="col btn btn-primary"
-						href=""
-						on:click={() => closeModal("modal-game-type")}>Host</a
-					>
-					<a
-						type="button"
-						class="col btn btn-primary"
-						href=""
-						on:click={() => closeModal("modal-game-type")}
-						>Connect</a
-					> -->
 				</div>
 				<div class="collapse" id="connector-host">
 					<div class="card card-body d-flex justify-content-center">

@@ -11,3 +11,10 @@ export function fuseAttributes(id: string, attributes: object) {
         element?.setAttribute(key, attribute);
     }
 }
+export function closeModal(id: string) {
+    let modal: HTMLElement = document.getElementById(id)!;
+    let backdrop: HTMLCollectionOf<Element> =
+        document.getElementsByClassName("modal-backdrop")!;
+    backdrop[0].remove();
+    modal.style.display = "none";
+}
