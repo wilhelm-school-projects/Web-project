@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Host } from "$lib/modules/ConnectToCanvas";
-    let host: Host = new Host();
+    import { HostConnector } from "$lib/modules/ConnectToCanvas";
+    let host: HostConnector = new HostConnector();
     let canvasRoute: string = "/game/host";
     let canvasName: string = "";
 

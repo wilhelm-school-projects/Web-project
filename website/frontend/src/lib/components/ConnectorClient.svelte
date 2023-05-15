@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { Client } from "$lib/modules/ConnectToCanvas";
-    let client: Client = new Client();
+    import { ClientConnector } from "$lib/modules/ConnectToCanvas";
+    let client: ClientConnector = new ClientConnector();
     let canvasRoute: string = "/game/client";
     let hostEmail: string = "";
 
     function connectToCanvas() {
-        // if (client.connectToCanvas(canvasName)) {
-        //     client.navigateTo(canvasRoute);
-        // } else {
-        //     console.log("Canvas does not exist");
-        // }
+        if (client.connectToCanvas(hostEmail)) {
+            client.navigateTo(canvasRoute);
+        } else {
+            console.log("Canvas does not exist");
+        }
     }
 </script>
 
