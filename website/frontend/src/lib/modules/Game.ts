@@ -1,16 +1,30 @@
-function initCanvas(gameCanvas: HTMLCanvasElement, gamectx: CanvasRenderingContext2D): void {
-    const scale = window.devicePixelRatio;
-    gameCanvas.style.height = '{window.innerHeight}px';
+class Game {
+    gameCanvas: HTMLCanvasElement;
+    gamectx: CanvasRenderingContext2D;
+    painting: boolean = false;
 
-    gameCanvas.style.width = '{window.innerWidth}px';
-    gameCanvas.height = window.innerHeight * scale;
-    gameCanvas.width = window.innerWidth * scale;
-    gamectx.scale(scale, scale);
-}
+    initCanvas(): void {
+        // Canvas size according to device pixel ratio
+        const scale = window.devicePixelRatio;
+        this.gameCanvas.style.height = '{window.innerHeight}px';
 
-export class GameHost {
-    private gameCanvas: HTMLCanvasElement;
-    private gamectx: CanvasRenderingContext2D;
+        this.gameCanvas.style.width = '{window.innerWidth}px';
+        this.gameCanvas.height = window.innerHeight * scale;
+        this.gameCanvas.width = window.innerWidth * scale;
+        this.gamectx.scale(scale, scale);
+
+        // Eventlisteners for mouse
+        this.gameCanvas.addEventListener('mousedown', () => {
+            this.painting = true;
+            console.log("mouse down");
+        });
+
+        this.gameCanvas.addEventListener('mouseup', () => {
+            this.painting = false;
+            console.log("mouse up");
+        });
+        console.log("this still works");
+    }
 
     constructor(gameCanvas: string) {
         this.gameCanvas = document.getElementById(gameCanvas) as HTMLCanvasElement;
@@ -18,15 +32,22 @@ export class GameHost {
             throw new Error("Game Canvas is null!");
         }
         this.gamectx = this.gameCanvas.getContext("2d") as CanvasRenderingContext2D;
-        initCanvas(this.gameCanvas, this.gamectx);
+        this.initCanvas();
 
     }
 
     run(): void {
+    }
+
+    end(): void {
+    }
+}
+
+export class GameHost extends Game {
+    run(): void {
         console.log("run");
         this.gamectx.fillStyle = "red";
         this.gamectx.arc(200, 200, 50, 0, Math.PI * 2);
-        // this.gamectx.fillRect(0, 0, 30, 30);
         console.log("height: " + this.gameCanvas.height);
         console.log("width: " + this.gameCanvas.width);
         this.gamectx.fill();
@@ -41,7 +62,7 @@ export class GameHost {
     }
 }
 
-export class GameClient {
+export class GameClient extends Game {
 
     run(): void {
         console.log("run");
@@ -50,16 +71,12 @@ export class GameClient {
     end(): void {
         console.log("end");
     }
-
-    private dummy(): void {
-        console.log("private dummy");
-    }
 }
 export function getGameType(playerType: string): GameHost | GameClient {
     console.log(playerType);
     if (playerType == 'host') {
         return new GameHost('game-canvas');
     } else {
-        return new GameClient();
+        return new GameClient('game-canvas');
     }
 } 

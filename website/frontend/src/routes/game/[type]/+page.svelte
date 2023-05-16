@@ -36,7 +36,7 @@
 		height: 100vh;
 	}  */
 	#game-canvas {
-		touch-action: none;
+		/* touch-action: none; */
 		/* image-rendering: -moz-crisp-edges; */
 		/* image-rendering: -webkit-crisp-edges; */
 		/* image-rendering: pixelated; */

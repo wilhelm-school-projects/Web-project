@@ -5,6 +5,7 @@
 	],
 	"/game/[type]": [
 		"src/routes/game/[type]/+page.js",
+		"src/routes/+layout.js",
 		"src/routes/+layout.js"
 	],
 	"/home": [
