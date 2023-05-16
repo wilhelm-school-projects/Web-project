@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
     import { onMount } from "svelte";
     // import { fuseAttributes } from "$lib/modules/DOMFunctions";
     // onMount(initNavbar); // onMount seems to run once every time i navigate to the page, seems redundant?
@@ -32,7 +32,7 @@
         </button>
     {/each}
 </nav>
-
+ -->
 <slot />
 
 <style>

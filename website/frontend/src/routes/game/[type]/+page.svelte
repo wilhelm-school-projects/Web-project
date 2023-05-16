@@ -20,7 +20,7 @@
 		<h1 class="text-center col">{gameType}</h1>
 	</div>
 	<div class="row">
-		<canvas id="game-canvas"> hej </canvas>
+		<canvas id="game-canvas" />
 	</div>
 	<!-- Should make a Canvas component -->
 </main>
@@ -36,7 +36,7 @@
 		height: 100vh;
 	}  */
 	#game-canvas {
-		/* touch-action: none; */
+		touch-action: none;
 		/* image-rendering: -moz-crisp-edges; */
 		/* image-rendering: -webkit-crisp-edges; */
 		/* image-rendering: pixelated; */
