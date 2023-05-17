@@ -1,14 +1,17 @@
 import { Rectangle, Circle, Painter } from '$lib/modules/Shape_Handler'
+import { SettingsHandler } from '$lib/modules/Settings_Handler'
 import { construct_svelte_component } from 'svelte/internal';
 
 class Game {
+    // Canvas and context might not be needed at Game level
     gameCanvas: HTMLCanvasElement;
     gamectx: CanvasRenderingContext2D;
-    Painter: Painter;
+    painter: Painter;
+    settingsHandler: SettingsHandler;
 
     constructor(gameCanvas: string) {
-        this.Painter = new Painter(gameCanvas);
-
+        this.painter = new Painter(gameCanvas);
+        this.settingsHandler = new SettingsHandler(this.painter);
     }
 
     run(): void {
@@ -20,9 +23,6 @@ class Game {
 
 export class GameHost extends Game {
     run(): void {
-        // this.gamectx.fillStyle = "red";
-        // this.gamectx.arc(200, 200, 50, 0, Math.PI * 2);
-        // this.gamectx.fill();
     }
 
     end(): void {

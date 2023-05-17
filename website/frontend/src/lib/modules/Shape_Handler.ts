@@ -58,11 +58,12 @@ export class Rectangle extends Shape {
 export class Painter {
     xPosMouse: number;
     yPosMouse: number;
+    currentShape = "circle";
+    painting = true; // Should be false, but for development I keep true
+    shapes: { [key: string]: any };
     drawInterval: ReturnType<typeof setInterval>;
     gamectx: CanvasRenderingContext2D;
     gameCanvas: HTMLCanvasElement;
-    currentShape = "circle";
-    shapes: { [key: string]: any };
 
     constructor(gameCanvas: string) {
         // Canvas and context
@@ -109,7 +110,7 @@ export class Painter {
         // console.dir(this.shapes);
     }
 
-    informationToJSON(): string {
+    shapeInformationToJSON(): string {
         console.log("JSONifying all shape information and returns it");
         return "";
     }
@@ -120,6 +121,10 @@ export class Painter {
 
     updateContext(shapesJSON: string): void {
         console.log("updating context");
+    }
+
+    togglePainting(): void {
+        this.painting = !this.painting;
     }
 }
 

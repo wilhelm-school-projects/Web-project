@@ -19,7 +19,7 @@
 	<div class="row">
 		<h1 class="text-center col">{gameType}</h1>
 	</div>
-	<div class="row">
+	<div id="canvas-wrapper" class="row">
 		<canvas id="game-canvas" />
 	</div>
 	<!-- Should make a Canvas component -->
