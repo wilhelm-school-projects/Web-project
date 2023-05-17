@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { page } from "$app/stores";
 	import { onMount } from "svelte";
-	import { getGameType, GameClient, GameHost } from "$lib/modules/Game";
+	import {
+		getGameType,
+		GameClient,
+		GameHost,
+	} from "$lib/modules/game_logic/Game";
 	// extract the game type from the url
 	let gameType: string = $page.url.href
 		.split("/")
