@@ -1,6 +1,8 @@
 import { c as create_ssr_component, a as subscribe, e as escape } from "../../../../chunks/index2.js";
 import { p as page } from "../../../../chunks/stores.js";
 import { r as readable } from "../../../../chunks/index.js";
+import "firebase/app";
+import "firebase/database";
 readable("context-id-1");
 const _page_svelte_svelte_type_style_lang = "";
 const css = {

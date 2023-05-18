@@ -24,7 +24,7 @@ class Game {
         this.settingsHandler = new SettingsHandler(this.painter, this.Networker);
 
         // setInterval(() => this.transmitShapes(), 10000);
-        this.transmitShapes();
+        this.recieveShapes();
     }
 
     async transmitShapes() {
@@ -32,6 +32,9 @@ class Game {
             this.painter.stoppedPaintingJustNow = false;
             return;
         }
+        // If an existing canvas is being connected to, the load of it needs to
+        // happen before this so there is no risk of sending an empty canvas to
+        // the backend and thus overwriting it. This should logic probably differs from host and client
         if (!this.painter.painting) {
             return;
         }
@@ -43,6 +46,12 @@ class Game {
             console.log("Transimitting shapes didn't go as planned")
         }
     }
+    async recieveShapes() {
+        console.log("recieving shapes")
+        let response = await this.Networker.getShapes();
+        console.log("response in recieveing shapes")
+        console.log(response)
+    }
 
     run(): void {
     }
@@ -53,12 +62,6 @@ class Game {
 
 export class GameHost extends Game {
 
-    // constructor(gameCanvas: string) {
-    //     super(gameCanvas);
-    //     console.log("context id: ");
-    //     console.log(get(contextID));
-
-    // }
     run(): void {
     }
 

@@ -6,7 +6,7 @@ import { CONTEXTID } from '$lib/modules/stores'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp, type FirebaseApp } from "firebase/app";
-import { getDatabase, ref, set, update, type Database } from "firebase/database";
+import { getDatabase, ref, set, update, onValue, type Database } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -66,7 +66,27 @@ export class NetworkHandler {
         await set(ref(this.database, path), message);
     }
 
-    async recieve(): Promise<string> {
-        return "";
+    async getShapes(): Promise<Object> {
+        let contextPath: string = get(CONTEXTID);
+        let response: Object;
+        response = await new Promise((resolve, reject) => {
+            onValue(ref(this.database, contextPath), (snapshot) => {
+                let data = snapshot.val();
+                resolve(data);
+            }, (error) => {
+                reject(error);
+            });
+        })
+        // let response = await onValue(ref(this.database, contextPath), (snapshot) => {
+        //     return new Promise((resolve, reject) => {
+        //         const data = snapshot.val();
+        //         resolve(data);
+
+
+        //     });
+        // });
+        console.log("response:")
+        console.log(response)
+        return response
     }
 }
