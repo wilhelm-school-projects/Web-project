@@ -12,8 +12,8 @@ export class SettingsHandler {
         // Initiate button Event listeners
         let sendButton = document.getElementById('button-Send-drawing-pane') as HTMLButtonElement;
         sendButton.addEventListener("click", async () => {
-            let response = await this.painter.stringifyShapeInformation();
-            this.Networker.send(response);
+            let response = await this.painter.getShapes();
+            this.Networker.updateShapes(response);
         });
 
         let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;

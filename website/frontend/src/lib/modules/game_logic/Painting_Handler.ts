@@ -122,18 +122,13 @@ export class Painter {
         }
     }
 
-    async stringifyShapeInformation(): Promise<string> {
-        // stringify the shape arrays and have a ID "CONTEXTID" as key to these two arrays
-        let keys = Object.keys(this.shapes);
-        let OKEY_PROPERTIES = [get(CONTEXTID), "shapes", "endAngle", "radius", "xPos", "yPos", "color", "alpha"].concat(keys);
-        let result: {
-            [key: string]: { [key: string]: Array<Shape> }
-        };
-        result = { [get(CONTEXTID)]: {} };
+    async getShapes(): Promise<Object> {
+        // Construct shapes' database format to be sent
+        let result: { [key: string]: Array<Shape> } = {};
         for (const currentShape of Object.keys(this.shapes)) {
-            result[get(CONTEXTID)][currentShape] = this.shapes[currentShape];
+            result[currentShape] = this.shapes[currentShape];
         }
-        return JSON.stringify(result, OKEY_PROPERTIES, 2); // remove "2" when done
+        return result;
     }
 
     loadContext(shapesJSON: string): void {
@@ -145,6 +140,20 @@ export class Painter {
     }
 }
 
+// Turns out all this fancy logic probably isn't needed. Should've read firebase docs before assuming something..
+// async stringifyShapeInformation(): Promise<string> {
+//     // stringify the shape arrays and have a ID "CONTEXTID" as key to these two arrays
+//     let keys = Object.keys(this.shapes);
+//     let OKEY_PROPERTIES = [get(CONTEXTID), "shapes", "endAngle", "radius", "xPos", "yPos", "color", "alpha"].concat(keys);
+//     let result: {
+//         [key: string]: { [key: string]: Array<Shape> }
+//     };
+//     result = { [get(CONTEXTID)]: {} };
+//     for (const currentShape of Object.keys(this.shapes)) {
+//         result[get(CONTEXTID)][currentShape] = this.shapes[currentShape];
+//     }
+//     return JSON.stringify(result, OKEY_PROPERTIES);
+// }
 
 
 

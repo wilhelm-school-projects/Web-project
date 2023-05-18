@@ -1,4 +1,4 @@
-import { c as create_ssr_component, d as each, e as escape, f as add_attribute, v as validate_component } from "../../../chunks/index.js";
+import { c as create_ssr_component, b as each, e as escape, d as add_attribute, v as validate_component } from "../../../chunks/index2.js";
 /* empty css                                                        */const css = {
   code: "#bottom-navbar.svelte-1d4vcpx{padding-bottom:1rem}",
   map: null
@@ -20,8 +20,7 @@ const NavbarHome = create_ssr_component(($$result, $$props, $$bindings, slots) =
 const Layout = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let paths = ["/home", "", "/home"];
   let texts = ["Settings", "I am bored", "Logout"];
-  return `
-${validate_component(NavbarHome, "Navbar").$$render($$result, { paths, texts }, {}, {})}
+  return `${validate_component(NavbarHome, "Navbar").$$render($$result, { paths, texts }, {}, {})}
 
 ${slots.default ? slots.default({}) : ``}`;
 });

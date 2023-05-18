@@ -1,16 +1,22 @@
-import { c as create_ssr_component, b as subscribe, e as escape } from "../../../../chunks/index.js";
+import { c as create_ssr_component, a as subscribe, e as escape } from "../../../../chunks/index2.js";
 import { p as page } from "../../../../chunks/stores.js";
+import { r as readable } from "../../../../chunks/index.js";
+readable("context-id-1");
+const _page_svelte_svelte_type_style_lang = "";
+const css = {
+  code: "#game-canvas.svelte-12yie24{touch-action:none}",
+  map: null
+};
 const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $page, $$unsubscribe_page;
   $$unsubscribe_page = subscribe(page, (value) => $page = value);
-  let path = $page.url.href;
+  let gameType = $page.url.href.split("/").at($page.url.href.split("/").length - 1);
+  $$result.css.add(css);
   $$unsubscribe_page();
-  return `<main><div class="row"><h1 class="text-center col">Paint</h1></div>
+  return `<main class="game-container"><div class="row"><h1 class="text-center col">${escape(gameType)}</h1></div>
+	<div id="canvas-wrapper" class="row"><canvas id="game-canvas" class="svelte-12yie24"></canvas></div>
 	
-	${escape(path)}</main>
-
-
-`;
+</main>`;
 });
 export {
   Page as default

@@ -23,12 +23,11 @@ class Game {
         this.Networker = new NetworkHandler();
         this.settingsHandler = new SettingsHandler(this.painter, this.Networker);
 
-        setInterval(() => this.transmit(), 500);
-        this.transmit();
+        // setInterval(() => this.transmitShapes(), 10000);
+        this.transmitShapes();
     }
 
-    async transmit() {
-        // this.painter.xPosMouse = 10;
+    async transmitShapes() {
         if (this.painter.stoppedPaintingJustNow) {
             this.painter.stoppedPaintingJustNow = false;
             return;
@@ -36,7 +35,13 @@ class Game {
         if (!this.painter.painting) {
             return;
         }
-        // this.Networker.send("hej");
+
+        let message = await this.painter.getShapes();
+        try {
+            let response = await this.Networker.updateShapes(message);
+        } catch (e) {
+            console.log("Transimitting shapes didn't go as planned")
+        }
     }
 
     run(): void {
