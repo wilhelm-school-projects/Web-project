@@ -4,7 +4,6 @@ import { NetworkHandler } from '$lib/modules/game_logic/Network_Handler'
 import { construct_svelte_component } from 'svelte/internal';
 
 //TODO:
-//  1.  developer button to run transmit()
 //  2.  read about firebase websocket variant
 //  3.  implement websocket variant
 //  4.  continue griding 
@@ -18,13 +17,13 @@ class Game {
     Networker: NetworkHandler;
 
 
+
     constructor(gameCanvas: string) {
         this.painter = new Painter(gameCanvas);
-        this.settingsHandler = new SettingsHandler(this.painter);
         this.Networker = new NetworkHandler();
-        // this.transmit = this.transmit.bind(this);
+        this.settingsHandler = new SettingsHandler(this.painter, this.Networker);
+
         setInterval(() => this.transmit(), 500);
-        // setInterval(this.transmit, 500);
         this.transmit();
     }
 
@@ -37,7 +36,7 @@ class Game {
         if (!this.painter.painting) {
             return;
         }
-        this.Networker.send("hej");
+        // this.Networker.send("hej");
     }
 
     run(): void {
@@ -48,6 +47,13 @@ class Game {
 }
 
 export class GameHost extends Game {
+
+    // constructor(gameCanvas: string) {
+    //     super(gameCanvas);
+    //     console.log("context id: ");
+    //     console.log(get(contextID));
+
+    // }
     run(): void {
     }
 

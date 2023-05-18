@@ -5,6 +5,7 @@ export class NetworkHandler {
     }
 
     async send(message: string): Promise<boolean> {
+        console.log("Skickar");
         console.log(message);
         return true;
     }

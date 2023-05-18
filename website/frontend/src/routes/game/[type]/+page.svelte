@@ -6,6 +6,7 @@
 		GameClient,
 		GameHost,
 	} from "$lib/modules/game_logic/Game";
+
 	// extract the game type from the url
 	let gameType: string = $page.url.href
 		.split("/")

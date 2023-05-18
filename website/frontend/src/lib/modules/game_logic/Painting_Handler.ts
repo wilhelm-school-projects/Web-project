@@ -1,3 +1,6 @@
+import { get } from 'svelte/store'
+import { CONTEXTID } from '$lib/modules/stores'
+
 class Shape {
     xPos: number;
     yPos: number;
@@ -64,11 +67,14 @@ export class Rectangle extends Shape {
 export class Painter {
     xPosMouse: number;
     yPosMouse: number;
-    currentShape = "circle";
+    currentShape: string;
     painting = true; // Should be initialized to false, but for development I keep true
     stoppedPaintingJustNow = false;
+
     shapes: { [key: string]: any };
+
     drawInterval: ReturnType<typeof setInterval>;
+
     gamectx: CanvasRenderingContext2D;
     gameCanvas: HTMLCanvasElement;
 
@@ -82,7 +88,7 @@ export class Painter {
         this.gameCanvas.height = window.innerHeight;
         this.gameCanvas.width = window.innerWidth;
 
-        // Event listeners
+        // Mouse Event listeners
         this.gameCanvas.addEventListener('mousemove', (Event) => {
             this.xPosMouse = Event.clientX;
             this.yPosMouse = Math.round(Event.clientY - this.gameCanvas.getBoundingClientRect().top);
@@ -90,24 +96,18 @@ export class Painter {
 
         this.gameCanvas.addEventListener('mousedown', (Event) => {
             this.drawInterval = setInterval(() => this.draw(Event), 50);
-            console.log("mouse down");
         });
 
         this.gameCanvas.addEventListener('mouseup', () => {
             clearInterval(this.drawInterval);
-            console.log("mouse up");
         });
 
         this.gameCanvas.addEventListener('mouseout', () => {
             clearInterval(this.drawInterval);
-            console.log("mouse leaves canvas");
         });
 
         // Shapes and stuff
         this.shapes = { rectangles: [], circles: [] };
-        for (const key of Object.keys(this.shapes)) {
-            this.shapes[key].unshift(key);
-        }
         this.currentShape = "circle";
     }
 
@@ -118,22 +118,22 @@ export class Painter {
             let endAngle = 2;
             this.shapes.circles.push(new Circle(this.xPosMouse, this.yPosMouse, radius, endAngle, "00, 00, 255", alpha, this.gamectx, this.gameCanvas));
         } else if (this.currentShape == "rectangle") {
-            this.shapes.rectangles.push(new Rectangle(this.xPosMouse, this.yPosMouse, "00,00,00", alpha, this.gamectx, this.gameCanvas));
+            this.shapes.rectangles.push(new Rectangle(this.xPosMouse, this.yPosMouse, "255,00,00", alpha, this.gamectx, this.gameCanvas));
         }
-        // console.dir(this.shapes);
     }
 
     async stringifyShapeInformation(): Promise<string> {
-        // console.log("JSONifying all shape information and returns it");
-        let OKEY_PROPERTIES = ["endAngle", "radius", "xPos", "yPos", "color", "alpha"];
-        let shapesJSON: string[] = [];
-        for (const key of Object.keys(this.shapes)) { // "in" means "key" will take the value of indices, compared to "of" which will take the element value, i.e. what the index correlates to.
-            shapesJSON.push(this.shapes[key]);
+        // stringify the shape arrays and have a ID "CONTEXTID" as key to these two arrays
+        let keys = Object.keys(this.shapes);
+        let OKEY_PROPERTIES = [get(CONTEXTID), "shapes", "endAngle", "radius", "xPos", "yPos", "color", "alpha"].concat(keys);
+        let result: {
+            [key: string]: { [key: string]: Array<Shape> }
+        };
+        result = { [get(CONTEXTID)]: {} };
+        for (const currentShape of Object.keys(this.shapes)) {
+            result[get(CONTEXTID)][currentShape] = this.shapes[currentShape];
         }
-        // console.log("shapes stringified: ");
-        // console.log(JSON.stringify(shapesJSON, OKEY_PROPERTIES));
-        return JSON.stringify(shapesJSON, OKEY_PROPERTIES);
-        // return JSON.stringify(this, ["shapes", "endAngle"]);
+        return JSON.stringify(result, OKEY_PROPERTIES, 2); // remove "2" when done
     }
 
     loadContext(shapesJSON: string): void {

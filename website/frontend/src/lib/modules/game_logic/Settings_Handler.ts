@@ -1,13 +1,23 @@
 import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
+import type { NetworkHandler } from '$lib/modules/game_logic/Network_Handler'
 
 export class SettingsHandler {
     painter: Painter;
+    Networker: NetworkHandler;
 
-    constructor(painter: Painter) {
+    constructor(painter: Painter, Networker: NetworkHandler) {
         this.painter = painter;
+        this.Networker = Networker;
 
-        let button = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;
-        button.addEventListener("click", async () => {
+        // Initiate button Event listeners
+        let sendButton = document.getElementById('button-Send-drawing-pane') as HTMLButtonElement;
+        sendButton.addEventListener("click", async () => {
+            let response = await this.painter.stringifyShapeInformation();
+            this.Networker.send(response);
+        });
+
+        let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;
+        drawButton.addEventListener("click", async () => {
             let canvasWrapper = document.getElementById(
                 "canvas-wrapper"
             ) as HTMLDivElement;
@@ -20,10 +30,6 @@ export class SettingsHandler {
                 canvasWrapper.style.cursor = "";
             }
             this.painter.painting = !this.painter.painting;
-            // console.log("JSONIFIED: "); // testing purposes
-            // console.log(this.painter.stringifyShapeInformation()); // testing purposes
-            let response = await this.painter.stringifyShapeInformation();
-            console.log(response);
         });
     }
 
