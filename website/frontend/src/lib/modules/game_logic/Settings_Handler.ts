@@ -12,6 +12,7 @@ export class SettingsHandler {
         // Initiate button Event listeners
         let sendButton = document.getElementById('button-Send-drawing-pane') as HTMLButtonElement;
         sendButton.addEventListener("click", async () => {
+            // this.painter.thinCanvas();
             let response = await this.painter.getShapes();
             this.Networker.updateShapes(response);
         });
@@ -21,15 +22,17 @@ export class SettingsHandler {
             let canvasWrapper = document.getElementById(
                 "canvas-wrapper"
             ) as HTMLDivElement;
-            if (this.painter.painting) {
+            if (this.painter.controlsCanvas) {
                 canvasWrapper.style.pointerEvents = "none";
                 canvasWrapper.style.cursor = "not-allowed";
                 this.painter.stoppedPaintingJustNow = true;
+                this.Networker.initiateShapeRetrieval();
             } else {
                 canvasWrapper.style.pointerEvents = "";
                 canvasWrapper.style.cursor = "";
+                this.Networker.stopShapeRetrieval();
             }
-            this.painter.painting = !this.painter.painting;
+            this.painter.controlsCanvas = !this.painter.controlsCanvas;
         });
     }
 

@@ -14,9 +14,14 @@
 	let game: GameHost | GameClient;
 	onMount(() => {
 		game = getGameType(gameType);
-
-		game.run();
-		game.end();
+		if (game instanceof GameClient) {
+			let canvasWrapper = document.getElementById(
+				"canvas-wrapper"
+			) as HTMLDivElement;
+			canvasWrapper.style.pointerEvents = "none";
+			canvasWrapper.style.cursor = "not-allowed";
+		} else {
+		}
 	});
 </script>
 

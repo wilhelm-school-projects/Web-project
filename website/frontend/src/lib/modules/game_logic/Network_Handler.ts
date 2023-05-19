@@ -1,12 +1,11 @@
-// TODO:
-//  1.  Why is database paths removed when website refresh?
 
 import { get } from 'svelte/store'
 import { CONTEXTID } from '$lib/modules/stores'
+import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp, type FirebaseApp } from "firebase/app";
-import { getDatabase, ref, set, update, onValue, type Database } from "firebase/database";
+import { getDatabase, ref, set, update, onValue, type Database, type Unsubscribe } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -28,16 +27,19 @@ const firebaseConfig = {
 export class NetworkHandler {
     firebaseApp: FirebaseApp;
     database: Database;
+    painter: Painter;
+    stopShapeRetrieval: Unsubscribe;
 
-    constructor() {
+    constructor(painter: Painter) {
         this.firebaseApp = initializeApp(firebaseConfig);
         this.database = getDatabase(this.firebaseApp);
+        this.painter = painter;
+
     }
 
     async updateShapes(message: Object): Promise<boolean> {
         try {
             let response = await this.sendUpdate(message, get(CONTEXTID));
-            console.log("Update: succesful")
         } catch (e) {
             console.log("Update failed")
             console.log(e)
@@ -66,27 +68,16 @@ export class NetworkHandler {
         await set(ref(this.database, path), message);
     }
 
-    async getShapes(): Promise<Object> {
+    initiateShapeRetrieval() {
         let contextPath: string = get(CONTEXTID);
         let response: Object;
-        response = await new Promise((resolve, reject) => {
-            onValue(ref(this.database, contextPath), (snapshot) => {
-                let data = snapshot.val();
-                resolve(data);
-            }, (error) => {
-                reject(error);
-            });
-        })
-        // let response = await onValue(ref(this.database, contextPath), (snapshot) => {
-        //     return new Promise((resolve, reject) => {
-        //         const data = snapshot.val();
-        //         resolve(data);
 
-
-        //     });
-        // });
-        console.log("response:")
-        console.log(response)
-        return response
+        this.stopShapeRetrieval = onValue(ref(this.database, contextPath), (snapshot) => {
+            let data = snapshot.val();
+            if (data === null) {
+                data = {}
+            }
+            this.painter.reloadContext(data);
+        });
     }
 }
