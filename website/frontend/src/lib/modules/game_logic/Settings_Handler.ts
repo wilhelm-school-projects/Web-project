@@ -1,39 +1,86 @@
 import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
 import type { NetworkHandler } from '$lib/modules/game_logic/Network_Handler'
+import { type Game, GameHost, GameClient } from '$lib/modules/game_logic/Game'
+// import styles from '$lib/modules/game_logic/animations.css?inline'
 
 export class SettingsHandler {
     painter: Painter;
     Networker: NetworkHandler;
+    game: Game
+    canvasWrapper: HTMLDivElement;
+    drawButton: HTMLElement;
 
-    constructor(painter: Painter, Networker: NetworkHandler) {
+    constructor(painter: Painter, Networker: NetworkHandler, game: Game) {
         this.painter = painter;
         this.Networker = Networker;
+        this.game = game;
+        this.canvasWrapper = document.getElementById(
+            "canvas-wrapper"
+        ) as HTMLDivElement;
+        this.drawButton = document.getElementById("button-Draw-drawing-pane") as HTMLElement;
 
-        // Initiate button Event listeners
-        let sendButton = document.getElementById('button-Send-drawing-pane') as HTMLButtonElement;
-        sendButton.addEventListener("click", async () => {
-            // this.painter.thinCanvas();
-            let response = await this.painter.getShapes();
-            this.Networker.updateShapes(response);
-        });
-
-        let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;
-        drawButton.addEventListener("click", async () => {
+        if (game instanceof GameClient) {
             let canvasWrapper = document.getElementById(
                 "canvas-wrapper"
             ) as HTMLDivElement;
+            canvasWrapper.style.pointerEvents = "none";
+            canvasWrapper.style.cursor = "not-allowed";
+
+        } else {
+
+        }
+
+        // Initiate button Event listeners
+        let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;
+        drawButton.addEventListener("click", async () => {
             if (this.painter.controlsCanvas) {
-                canvasWrapper.style.pointerEvents = "none";
-                canvasWrapper.style.cursor = "not-allowed";
-                this.painter.stoppedPaintingJustNow = true;
-                this.Networker.initiateShapeRetrieval();
+                this.lockCanvas();
+                await this.Networker.removeCanvasControl();
             } else {
-                canvasWrapper.style.pointerEvents = "";
-                canvasWrapper.style.cursor = "";
-                this.Networker.stopShapeRetrieval();
+                this.obtainCanvasControl();
             }
-            this.painter.controlsCanvas = !this.painter.controlsCanvas;
-        });
+        })
     }
 
+    async obtainCanvasControl() {
+        try {
+            let response = await this.Networker.requestCanvasControl();
+            this.unlockCanvas();
+        } catch (e) {
+            this.animationNotLoggedInButton()
+            console.log("Couldn't obtain canvas control:")
+            console.log(e)
+        }
+    }
+
+    async animationNotLoggedInButton() {
+        this.drawButton.style.backgroundColor = "red"
+        await new Promise(r => setTimeout(r, 600));
+        this.drawButton.style.backgroundColor = "green"
+        await new Promise(r => setTimeout(r, 400));
+        this.drawButton.style.backgroundColor = "red"
+        await new Promise(r => setTimeout(r, 200));
+        this.drawButton.style.backgroundColor = "green"
+        await new Promise(r => setTimeout(r, 200));
+        this.drawButton.style.backgroundColor = "red"
+        await new Promise(r => setTimeout(r, 1000));
+        this.drawButton.style.backgroundColor = ""
+    }
+
+    lockCanvas() {
+        this.painter.controlsCanvas = false;
+        this.canvasWrapper.style.pointerEvents = "none";
+        this.canvasWrapper.style.cursor = "not-allowed";
+        this.painter.stoppedPaintingJustNow = true;
+        this.Networker.initiateShapeRetrieval();
+        this.drawButton.style.backgroundColor = ""
+    }
+
+    unlockCanvas() {
+        this.canvasWrapper.style.pointerEvents = "";
+        this.canvasWrapper.style.cursor = "";
+        this.Networker.stopShapeRetrieval();
+        this.painter.controlsCanvas = true;
+        this.drawButton.style.backgroundColor = "green"
+    }
 }

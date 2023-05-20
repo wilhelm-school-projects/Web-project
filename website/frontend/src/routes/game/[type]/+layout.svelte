@@ -1,6 +1,6 @@
 <!-- Probably redundant -->
 <script lang="ts">
-    let texts: string[] = ["Draw", "Send", "dummy"];
+    let texts: string[] = ["Draw", "Clear", "dummy"];
 </script>
 
 <nav
@@ -10,7 +10,7 @@
     {#each texts as text, i}
         <button
             id="button-{text}-drawing-pane"
-            class="col text-center btn btn-outline-secondary"
+            class="col text-dark text-center btn btn-outline-secondary"
         >
             {texts[i]}
         </button>

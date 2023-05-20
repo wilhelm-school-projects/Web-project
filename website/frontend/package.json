@@ -33,6 +33,7 @@
 		"@auth0/auth0-spa-js": "^2.0.4",
 		"bootstrap": "^5.2.3",
 		"dotenv": "^16.0.3",
-		"firebase": "^9.22.0"
+		"firebase": "^9.22.0",
+		"set-interval-async": "^3.0.3"
 	}
 }

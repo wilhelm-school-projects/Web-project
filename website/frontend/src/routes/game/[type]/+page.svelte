@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/stores";
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import {
 		getGameType,
 		GameClient,
@@ -14,14 +14,6 @@
 	let game: GameHost | GameClient;
 	onMount(() => {
 		game = getGameType(gameType);
-		if (game instanceof GameClient) {
-			let canvasWrapper = document.getElementById(
-				"canvas-wrapper"
-			) as HTMLDivElement;
-			canvasWrapper.style.pointerEvents = "none";
-			canvasWrapper.style.cursor = "not-allowed";
-		} else {
-		}
 	});
 </script>
 
@@ -32,24 +24,10 @@
 	<div id="canvas-wrapper" class="row">
 		<canvas id="game-canvas" />
 	</div>
-	<!-- Should make a Canvas component -->
 </main>
 
 <style>
-	/* html,
-	body {
-		margin: 0px;
-		height: 100%;
-	} */
-	/* .game-container {
-		width: 100vh; 
-		height: 100vh;
-	}  */
 	#game-canvas {
 		touch-action: none;
-		/* image-rendering: -moz-crisp-edges; */
-		/* image-rendering: -webkit-crisp-edges; */
-		/* image-rendering: pixelated; */
-		/* image-rendering: crisp-edges; */
 	}
 </style>

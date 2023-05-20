@@ -5,7 +5,7 @@ import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp, type FirebaseApp } from "firebase/app";
-import { getDatabase, ref, set, update, onValue, type Database, type Unsubscribe } from "firebase/database";
+import { getDatabase, ref, set, update, onValue, get as fireGet, remove, type Database, type Unsubscribe } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -39,7 +39,8 @@ export class NetworkHandler {
 
     async updateShapes(message: Object): Promise<boolean> {
         try {
-            let response = await this.sendUpdate(message, get(CONTEXTID));
+            let path = get(CONTEXTID) + '/shapes';
+            let response = await this.sendUpdate(message, path);
         } catch (e) {
             console.log("Update failed")
             console.log(e)
@@ -69,7 +70,7 @@ export class NetworkHandler {
     }
 
     initiateShapeRetrieval() {
-        let contextPath: string = get(CONTEXTID);
+        let contextPath: string = get(CONTEXTID) + '/shapes';
         let response: Object;
 
         this.stopShapeRetrieval = onValue(ref(this.database, contextPath), (snapshot) => {
@@ -80,4 +81,65 @@ export class NetworkHandler {
             this.painter.reloadContext(data);
         });
     }
+
+    private async canvasIsControlled(path: string): Promise<boolean> {
+        try {
+            let response = await fireGet(ref(this.database, path));
+            if (!response.exists()) {
+                return false;
+            }
+        } catch (e) {
+            console.log("(canvasIsControlled) Failure:")
+            console.log(e)
+            return false;
+        }
+        return true;
+    }
+
+    async requestCanvasControl(): Promise<string> {
+        return new Promise(async (resolve, reject) => {
+            let userEmail: string | null = localStorage.getItem("email");
+            if (userEmail === null) {
+                reject("(reuquestCanvasControl) user email doens't exist in localstorage")
+                return; // reject does not return the function
+            }
+            userEmail = encodeURIComponent(userEmail).replace('.', '%2E');
+            let controlPath = get(CONTEXTID) + '/control'
+
+            // Check if anyone has control of the canvas
+            if (await this.canvasIsControlled(controlPath)) {
+                reject("(requestCanvasControl) canvas is being controlled by someone else")
+                return;
+            }
+
+            await this.sendUpdate(userEmail, controlPath);
+
+            // Make sure we obtained the control
+            try {
+                let response = await fireGet(ref(this.database, controlPath));
+                if (!response.exists()) {
+                    reject("(requestCanvasControl) no email exists even though we tried to grab control")
+                    return;
+
+                }
+                let email = response.val()
+                if (email !== userEmail) {
+                    // Someone else was quicker to grab the control
+                    reject("Another user controls the canvas")
+                    return
+                }
+            } catch (e) {
+                reject("(requestCanvasControl) fireGet failed when checking if we got control:")
+                return;
+            }
+            resolve("Successfully grabbed control over canvas")
+        });
+    }
+
+    async removeCanvasControl() {
+        let controlPath = get(CONTEXTID) + '/control'
+        await remove(ref(this.database, controlPath));
+    }
+
+
 }

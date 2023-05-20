@@ -1,7 +1,3 @@
-// import { get } from 'svelte/store'
-// import { CONTEXTID } from '$lib/modules/stores'
-
-import { draw } from "svelte/transition";
 
 class Shape {
     xPos: number;
@@ -64,9 +60,10 @@ export class Circle extends Shape {
     }
 
     equals(shape: Circle): boolean {
-        if (this.alpha === shape.alpha || this.color === shape.color || this.endAngle === shape.endAngle ||
-            this.radius === shape.radius || this.xPos === shape.xPos || this.yPos === shape.yPos) {
+        if (this.alpha === shape.alpha && this.color === shape.color && this.endAngle === shape.endAngle &&
+            this.radius === shape.radius && this.xPos === shape.xPos && this.yPos === shape.yPos) {
             return true;
+        } else {
         }
         return false;
     }
@@ -127,7 +124,13 @@ export class Painter {
 
         this.gameCanvas.addEventListener('mousedown', (Event) => {
             this.drawInterval = setInterval(() => this.drawCurrentShape(Event), 50);
+            // this.drawCurrentShape(Event)
+            console.log("drraw")
         });
+
+        // this.gameCanvas.addEventListener('mousedown', (Event) => {
+        //     this.drawInterval = setInterval(() => this.drawCurrentShape(Event), 50);
+        // });
 
         this.gameCanvas.addEventListener('mouseup', () => {
             clearInterval(this.drawInterval);
@@ -185,8 +188,6 @@ export class Painter {
         for (const key of Object.keys(this.shapes)) {
             result[key] = []
             for (const val of this.shapes[key]) {
-                // Don't know why vscode marks endAngle and radius to not be a property of val.
-                // currentShape = { alpha: val.alpha, color: val.color, endAngle: val.endAngle, radius: val.radius, xPos: val.xPos, yPos: val.yPos, }
                 currentShape = { alpha: val.alpha, color: val.color, endAngle: 2, radius: 10, xPos: val.xPos, yPos: val.yPos, }
                 result[key].push(currentShape)
             }
@@ -195,10 +196,10 @@ export class Painter {
     }
 
     thinCanvas(): void {
-        // Iterate of all arrays of shapes and remove the current element if we find an equal
-        // Doesn't work properly. Removes too many elements and keeps som duplicates.
+        // To slow to be able to run frequently and the function "equals" is to
+        // exact to make any difference
         for (const key of Object.keys(this.shapes)) {
-            for (let i = 0; i < this.shapes[key].length; i++) {
+            for (let i = 0; i < this.shapes[key].length;) {
                 if (this.shapes[key].length === 0) {
                     continue
                 }
@@ -209,10 +210,13 @@ export class Painter {
                         count++;
                     }
                 })
-                if (count > 2) {
+                if (count > 1) {
                     let j = this.shapes[key].indexOf(currentShape)
                     this.shapes[key].splice(j, 1)
+                } else {
+                    i++;
                 }
+
             }
         }
     }
@@ -226,7 +230,6 @@ export class Painter {
                 this.shapes[key].push(new Circle(value.xPos, value.yPos, value.radius, value.endAngle, value.color, value.alpha, this.gamectx, value.gameCanvas));
             })
         }
-        // this.thinCanvas()
     }
 }
 

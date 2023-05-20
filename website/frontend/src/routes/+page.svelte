@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { createAuth0Client } from '@auth0/auth0-spa-js';
-	import { slide, fade } from 'svelte/transition';
+	import { createAuth0Client } from "@auth0/auth0-spa-js";
+	import { onMount } from "svelte";
+	import { slide, fade } from "svelte/transition";
 
 	let isdisabled: boolean = false;
 
@@ -40,7 +41,8 @@
 	// AUTH0_END
 
 	async function login() {
-		console.log('login');
+		localStorage.setItem("email", "pinto@pinto.se");
+		console.log("login");
 
 		// Auth0 specific code.
 		// try{
@@ -57,15 +59,17 @@
 		// }
 	}
 	function logout() {
-		console.log('logout');
+		console.log("logout");
 	}
-
+	onMount(() => {
+		login();
+	});
 	// Executed directly ~ "main"
 	// initAuth0();
 </script>
 
 <!-- transition:slide={{ axis: 'x', duration: 700 }} -->
-<main in:slide={{ axis: 'x', duration: 700 }}>
+<main in:slide={{ axis: "x", duration: 700 }}>
 	<div id="header" class="row">
 		<div class="col d-flex justify-content-center">
 			<h1 class="h1">Montem!</h1>
