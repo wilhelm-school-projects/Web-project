@@ -1,21 +1,22 @@
-import { c as create_ssr_component } from "../../chunks/index2.js";
-import "../../chunks/firebase.js";
-import { createRequire } from "node:module";
+import { c as create_ssr_component, d as add_attribute } from "../../chunks/index2.js";
 const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  const require2 = createRequire(import.meta.url);
-  const firebase = require2("./firebase");
-  console.log(firebase);
+  let userEmail;
+  let password;
   return `
-<main><script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"><\/script>
-    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css">
-
-    <div id="header" class="row"><div class="col d-flex justify-content-center"><h1 class="h1">Montem!</h1></div></div>
+<main><div id="header" class="row"><div class="col d-flex justify-content-center"><h1 class="h1">Montem!</h1></div></div>
 
     <div class="row"><div id="left-col" class="col-2 border"></div>
-        <div id="main-col" class="col"><form class=""><label for="">Sign in</label>
-                <input type="text" class="rounded">
-                <input type="" class="rounded"></form></div>
+        <form id="main-col" class="col d-flex justify-content-center">
+            <div><div class="row"><label for="userEmail">Email: </label>
+                    <input name="userEmail" type="email" class="rounded"${add_attribute("value", userEmail, 0)}></div>
+                <div class="row"><label for="password">Password: </label>
+                    <input name="password" type="text" class="rounded"${add_attribute("value", password, 0)}></div></div></form>
+        
         <div id="right-col" class="col-2 border"></div></div>
+    <div class="row"><button id="button-signin" class="col btn btn-primary">Sign in
+        </button></div>
+    <div class="row"><button id="button-signup" class="col btn btn-danger">Sign up
+        </button></div>
 </main>`;
 });
 export {

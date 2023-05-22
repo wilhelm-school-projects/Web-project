@@ -2,6 +2,11 @@
     import { onMount } from "svelte";
     import { slide, fade } from "svelte/transition";
     import { fireAuth } from "$lib/modules/firebase";
+    import {
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        type UserCredential,
+    } from "firebase/auth";
 
     //"FirebaseUI is not compatiable with Firebase SDk v9.0.0+ for now, currently it
     //is still dependent on Firebase v8. We're working on it right now, you can see
@@ -14,9 +19,14 @@
     let isdisabled: boolean = false;
     let signInBtn: HTMLButtonElement;
     let signUpBtn: HTMLButtonElement;
+    let wrongCredentialsModal: HTMLElement;
 
-    function logout() {
-        console.log("logout");
+    function closeModal() {
+        wrongCredentialsModal.style.display = "none";
+    }
+
+    function showModal() {
+        wrongCredentialsModal.style.display = "block";
     }
 
     const validEmail = (email: string): boolean => {
@@ -31,30 +41,65 @@
         }
         return true;
     };
-    function signInUser() {
+    async function signInUser() {
         console.log("signin");
         if (inputsAreEmpty()) {
             return;
         }
         if (!validEmail(userEmail)) {
+            showModal();
             console.log("not valid!");
             return;
         }
+
+        let userCredential: UserCredential | null;
+        try {
+            let userCredentials = await signInWithEmailAndPassword(
+                fireAuth,
+                userEmail,
+                password
+            );
+            console.log(userCredentials);
+        } catch (e) {
+            showModal();
+            console.log(e);
+        }
     }
-    function signUpUser() {
+    async function signUpUser() {
         console.log("signUp");
         if (inputsAreEmpty()) {
             return;
         }
+        if (!validEmail(userEmail)) {
+            showModal();
+            console.log("not valid!");
+            return;
+        }
+        try {
+            let userCredentials = await createUserWithEmailAndPassword(
+                fireAuth,
+                userEmail,
+                password
+            );
+            console.log(userCredentials);
+        } catch (e) {
+            console.log(e);
+        }
     }
-    // function initiateButtons() {
-    //     signInBtn = document.getElementById(
-    //         "button-signin"
-    //     ) as HTMLButtonElement;
-    //     signUpBtn = document.getElementById(
-    //         "button-signin"
-    //     ) as HTMLButtonElement;
-    // }
+    function initiateHTMLElements() {
+        signInBtn = document.getElementById(
+            "button-signin"
+        ) as HTMLButtonElement;
+
+        signUpBtn = document.getElementById(
+            "button-signin"
+        ) as HTMLButtonElement;
+
+        wrongCredentialsModal = document.getElementById(
+            "modal-wrong-credentials"
+        ) as HTMLButtonElement;
+    }
+
     function inputsAreEmpty() {
         if (userEmail === "" || password === "") {
             return true;
@@ -62,8 +107,8 @@
         return false;
     }
     onMount(async () => {
-        // initiateButtons();
-        // login();
+        localStorage.setItem("email", "pinto@pinto.se");
+        initiateHTMLElements();
     });
 
     // signInWithEmailAndPassword(auth, email, password)
@@ -80,15 +125,6 @@
 
 <!-- transition:slide={{ axis: 'x', duration: 700 }} -->
 <main in:slide={{ axis: "x", duration: 700 }}>
-    <script
-        src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"
-    ></script>
-    <link
-        type="text/css"
-        rel="stylesheet"
-        href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css"
-    />
-
     <div id="header" class="row">
         <div class="col d-flex justify-content-center">
             <h1 class="h1">Montem!</h1>
@@ -114,7 +150,7 @@
                     <input
                         name="password"
                         bind:value={password}
-                        type="text"
+                        type="password"
                         class=" rounded"
                     />
                 </div>
@@ -140,6 +176,28 @@
         >
             Sign up
         </button>
+    </div>
+
+    <div id="modal-wrong-credentials" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Wrong input!</h5>
+                </div>
+                <div class="modal-body">Try again..</div>
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                        on:click={closeModal}
+                    >
+                        X
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 

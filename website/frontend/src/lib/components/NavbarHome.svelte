@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { fuseAttributes } from '$lib/modules/DOMFunctions';
+	import { onMount } from "svelte";
+	import { fuseAttributes } from "$lib/modules/DOMFunctions";
 
 	export let paths: string[];
 	export let texts: string[];
@@ -27,8 +27,11 @@
 	// on:click={onclicks.at(i)}
 
 	function initNavbar() {
-		let attributes = { 'data-bs-toggle': 'modal', 'data-bs-target': '#modal-game-type' };
-		let anchorId: string = 'anchor-' + paths.at(1);
+		let attributes = {
+			"data-bs-toggle": "modal",
+			"data-bs-target": "#modal-game-type",
+		};
+		let anchorId: string = "anchor-" + paths.at(1);
 		fuseAttributes(anchorId, attributes);
 	}
 
@@ -40,7 +43,11 @@
 	class="navbar fixed-bottom row padding-bottom justify-content-center d-flex"
 >
 	{#each paths as path, i}
-		<a id="anchor-{path}" class="col text-center btn btn-outline-secondary" href={path}>
+		<a
+			id="anchor-{path}"
+			class="col text-center btn btn-outline-secondary"
+			href={path}
+		>
 			{texts[i]}
 		</a>
 	{/each}
