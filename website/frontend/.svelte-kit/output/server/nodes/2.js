@@ -1,7 +1,6 @@
 
 
 export const index = 2;
-export const component = async () => (await import('../entries/pages/game/_type_/_layout.svelte.js')).default;
-export const imports = ["_app/immutable/entry/game-_type_-layout.svelte.a378b80d.js","_app/immutable/chunks/index.3fff79e7.js"];
+export const imports = [];
 export const stylesheets = [];
 export const fonts = [];

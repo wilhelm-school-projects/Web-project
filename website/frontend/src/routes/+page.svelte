@@ -1,91 +1,146 @@
 <script lang="ts">
-	import { createAuth0Client } from "@auth0/auth0-spa-js";
-	import { onMount } from "svelte";
-	import { slide, fade } from "svelte/transition";
+    import { onMount } from "svelte";
+    import { slide, fade } from "svelte/transition";
+    import { fireAuth } from "$lib/modules/firebase";
 
-	let isdisabled: boolean = false;
+    //"FirebaseUI is not compatiable with Firebase SDk v9.0.0+ for now, currently it
+    //is still dependent on Firebase v8. We're working on it right now, you can see
+    //update in this PR"
+    //
+    // Therefore I cannot use their simple login with google :(
 
-	// AUTH0_BEGIN
-	//  The domain and clientid should in deployement be fetched from my server.
-	//  Finish later, when back-end is up as well
-	// let auth0Client;
-	// async function createAuth() {
-	// 	auth0Client = await createAuth0Client({
-	// 		domain: 'dev-54ir3ia7u1gzyg05.eu.auth0.com',
-	// 		clientId: 'LcxGNNOcIWMaquUi3w69GuYOfLiY9sIt'
-	// 	});
-	// 	console.log('resolving createAuth');
-	// 	return new Promise((resolve) => {
-	// 		resolve('');
-	// 	});
-	// }
+    let userEmail: string;
+    let password: string;
+    let isdisabled: boolean = false;
+    let signInBtn: HTMLButtonElement;
+    let signUpBtn: HTMLButtonElement;
 
-	// const authenticate = async () => {
-	// 	try {
-	// 		const isAuthenticated: boolean = await auth0Client.isAuthenticated();
-	// 		console.log('Is authenticated: ');
-	// 		console.log(isAuthenticated);
-	// 	} catch (err) {
-	// 		console.log('Error!');
-	// 		console.log(err);
-	// 	}
-	// 	return new Promise((resolve) => {
-	// 		resolve('');
-	// 	});
-	// };
+    function logout() {
+        console.log("logout");
+    }
 
-	// async function initAuth0() {
-	// 	await createAuth();
-	// 	await authenticate();
-	// }
-	// AUTH0_END
+    const validEmail = (email: string): boolean => {
+        if (
+            String(email)
+                .toLowerCase()
+                .match(
+                    /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+                ) === null
+        ) {
+            return false;
+        }
+        return true;
+    };
+    function signInUser() {
+        console.log("signin");
+        if (inputsAreEmpty()) {
+            return;
+        }
+        if (!validEmail(userEmail)) {
+            console.log("not valid!");
+            return;
+        }
+    }
+    function signUpUser() {
+        console.log("signUp");
+        if (inputsAreEmpty()) {
+            return;
+        }
+    }
+    // function initiateButtons() {
+    //     signInBtn = document.getElementById(
+    //         "button-signin"
+    //     ) as HTMLButtonElement;
+    //     signUpBtn = document.getElementById(
+    //         "button-signin"
+    //     ) as HTMLButtonElement;
+    // }
+    function inputsAreEmpty() {
+        if (userEmail === "" || password === "") {
+            return true;
+        }
+        return false;
+    }
+    onMount(async () => {
+        // initiateButtons();
+        // login();
+    });
 
-	async function login() {
-		localStorage.setItem("email", "pinto@pinto.se");
-		console.log("login");
-
-		// Auth0 specific code.
-		// try{
-		//   let res = await auth0Client.loginWithRedirect({
-		//     authorizationParams: {
-		//       redirect_uri: window.location.origin
-		//     }
-		//   });
-		//   console.log(res);
-		// } catch(err){
-
-		//   console.log("Error!");
-		//   console.log(err);
-		// }
-	}
-	function logout() {
-		console.log("logout");
-	}
-	onMount(() => {
-		login();
-	});
-	// Executed directly ~ "main"
-	// initAuth0();
+    // signInWithEmailAndPassword(auth, email, password)
+    //     .then((userCredential) => {
+    //         // Signed in
+    //         const user = userCredential.user;
+    //         // ...
+    //     })
+    //     .catch((error) => {
+    //         const errorCode = error.code;
+    //         const errorMessage = error.message;
+    //     });
 </script>
 
 <!-- transition:slide={{ axis: 'x', duration: 700 }} -->
 <main in:slide={{ axis: "x", duration: 700 }}>
-	<div id="header" class="row">
-		<div class="col d-flex justify-content-center">
-			<h1 class="h1">Montem!</h1>
-		</div>
-	</div>
-	<div class="row">
-		<div id="left-col" class="col-2 border" />
-		<div id="main-col" class="col">
-			<form class="">
-				<label for="">Sign in</label>
-				<input type="text" class="rounded" />
-				<input type="" class="rounded" />
-			</form>
-		</div>
-		<div id="right-col" class="col-2 border" />
-	</div>
+    <script
+        src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"
+    ></script>
+    <link
+        type="text/css"
+        rel="stylesheet"
+        href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css"
+    />
+
+    <div id="header" class="row">
+        <div class="col d-flex justify-content-center">
+            <h1 class="h1">Montem!</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="left-col" class="col-2 border" />
+        <form id="main-col" class="col d-flex justify-content-center">
+            <!-- this div makes ^d-flex and justify-content-center work-->
+            <div>
+                <div class="row">
+                    <label for="userEmail"> Email: </label>
+                    <input
+                        name="userEmail"
+                        bind:value={userEmail}
+                        type="email"
+                        class=" rounded"
+                    />
+                </div>
+                <div class="row">
+                    <label for="password"> Password: </label>
+                    <input
+                        name="password"
+                        bind:value={password}
+                        type="text"
+                        class=" rounded"
+                    />
+                </div>
+            </div>
+        </form>
+        <!-- </div> -->
+        <div id="right-col" class="col-2 border" />
+    </div>
+    <div class="row">
+        <button
+            id="button-signin"
+            class="col btn btn-primary"
+            on:click={signInUser}
+        >
+            Sign in
+        </button>
+    </div>
+    <div class="row">
+        <button
+            id="button-signup"
+            class="col btn btn-danger"
+            on:click={signUpUser}
+        >
+            Sign up
+        </button>
+    </div>
 </main>
 
 <style>

@@ -1,12 +1,13 @@
 import { c as create_ssr_component, a as subscribe, e as escape } from "../../../../chunks/index2.js";
 import { p as page } from "../../../../chunks/stores.js";
 import { r as readable } from "../../../../chunks/index.js";
-import "firebase/app";
+import "../../../../chunks/firebase.js";
 import "firebase/database";
+import "set-interval-async";
 readable("context-id-1");
 const _page_svelte_svelte_type_style_lang = "";
 const css = {
-  code: "#game-canvas.svelte-12yie24{touch-action:none}",
+  code: "#game-canvas.svelte-oj7mwg{touch-action:none}",
   map: null
 };
 const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -16,8 +17,7 @@ const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$result.css.add(css);
   $$unsubscribe_page();
   return `<main class="game-container"><div class="row"><h1 class="text-center col">${escape(gameType)}</h1></div>
-	<div id="canvas-wrapper" class="row"><canvas id="game-canvas" class="svelte-12yie24"></canvas></div>
-	
+	<div id="canvas-wrapper" class="row"><canvas id="game-canvas" class="svelte-oj7mwg"></canvas></div>
 </main>`;
 });
 export {
