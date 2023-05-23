@@ -3,6 +3,9 @@
 		"src/routes/+layout.js",
 		"src/routes/+layout.js"
 	],
+	"/game": [
+		"src/routes/+layout.js"
+	],
 	"/game/[type]": [
 		"src/routes/game/[type]/+page.js",
 		"src/routes/+layout.js",

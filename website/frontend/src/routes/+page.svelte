@@ -1,17 +1,63 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { slide, fade } from "svelte/transition";
-    import { customFire } from "$lib/modules/firebase";
+    import { authHandler } from "$lib/modules/stores";
+    import { get } from "svelte/store";
+    import { goto } from "$app/navigation";
 
     //"FirebaseUI is not compatiable with Firebase SDk v9.0.0+ for now, currently it
     //is still dependent on Firebase v8. We're working on it right now, you can see
     //update in this PR"
     //
     // Therefore I cannot use their simple login with google :(
+    let signInBtn: HTMLButtonElement;
+    let signUpBtn: HTMLButtonElement;
+    let wrongCredentialsModal: HTMLDivElement;
+    let userEmail: string;
+    let password: string;
+
+    function closeModal() {
+        wrongCredentialsModal.style.display = "none";
+    }
+
+    function showModal() {
+        wrongCredentialsModal.style.display = "block";
+    }
+
+    function initiateHTMLElements() {
+        signInBtn = document.getElementById(
+            "button-signin"
+        ) as HTMLButtonElement;
+
+        signUpBtn = document.getElementById(
+            "button-signup"
+        ) as HTMLButtonElement;
+
+        signUpBtn.addEventListener("click", async () => {
+            get(authHandler).signUp(() => {
+                showModal();
+            });
+        });
+
+        signInBtn.addEventListener("click", async () => {
+            get(authHandler).signIn(() => {
+                showModal();
+            });
+        });
+
+        wrongCredentialsModal = document.getElementById(
+            "modal-wrong-credentials"
+        ) as HTMLDivElement;
+    }
+
+    $: {
+        get(authHandler).setEmail(userEmail);
+        get(authHandler).setPassword(password);
+    }
 
     onMount(async () => {
         localStorage.setItem("email", "pinto@pinto.se");
-        customFire.initiateHTMLElements();
+        initiateHTMLElements();
     });
 </script>
 
@@ -32,7 +78,7 @@
                     <label for="userEmail"> Email: </label>
                     <input
                         name="userEmail"
-                        bind:value={customFire.userEmail}
+                        bind:value={userEmail}
                         type="email"
                         class=" rounded"
                     />
@@ -41,7 +87,7 @@
                     <label for="password"> Password: </label>
                     <input
                         name="password"
-                        bind:value={customFire.password}
+                        bind:value={password}
                         type="password"
                         class=" rounded"
                     />
@@ -73,7 +119,7 @@
                         class="btn btn-primary"
                         data-bs-dismiss="modal"
                         aria-label="Close"
-                        on:click={customFire.closeModal}
+                        on:click={closeModal}
                     >
                         X
                     </button>

@@ -4,23 +4,22 @@ import { NetworkHandler } from '$lib/modules/game_logic/Network_Handler'
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 
 //TODO:
-//  3.  login logic
 //  4.  logic to connect / initate new canvas
+//  5.  Button to invite email to existing canvas
 //  7.  Clear canvas
+//  8.  Refreshing the page should not cause the person to log out or loose
+//      connection to current canvas. Low priority
 
 export class Game {
-    // Canvas and context might not be needed at Game level
-    gameCanvas: HTMLCanvasElement;
-    gamectx: CanvasRenderingContext2D;
+    canvasID: string;
     painter: Painter;
     settingsHandler: SettingsHandler;
     Networker: NetworkHandler;
     intervalAsyncTimer: any;
-    constructor() {
-        // transmitShapes triggers 2 times for 1 click. If interval is set to
-        // e.g., 1000 this doesn't happen. setIntervalAsync doesn't probably run
-        // two callbacks at the same time. Why does it trigger transmit two
-        // times?
+
+    constructor(canvasID: string) {
+        this.canvasID = canvasID;
+
         this.intervalAsyncTimer = setIntervalAsync(async () => {
             await this.transmitShapes()
         }, 50)
@@ -69,29 +68,22 @@ export class Game {
 
 export class GameHost extends Game {
 
-    constructor(gameCanvas: string) {
-        super();
+    constructor(gameCanvas: string, canvasID: string) {
+        super(canvasID);
         this.painter = new Painter(gameCanvas, true)
         this.Networker = new NetworkHandler(this.painter);
         this.settingsHandler = new SettingsHandler(this.painter, this.Networker, this);
     }
+
 }
 
 export class GameClient extends Game {
 
-    constructor(gameCanvas: string) {
-        super();
+    constructor(gameCanvas: string, canvasID: string) {
+        super(canvasID);
         this.painter = new Painter(gameCanvas, false)
         this.Networker = new NetworkHandler(this.painter);
         this.settingsHandler = new SettingsHandler(this.painter, this.Networker, this);
         this.Networker.initiateShapeRetrieval();
     }
 }
-export function getGameType(playerType: string): GameHost | GameClient {
-    console.log(playerType);
-    if (playerType == 'host') {
-        return new GameHost('game-canvas');
-    } else {
-        return new GameClient('game-canvas');
-    }
-} 

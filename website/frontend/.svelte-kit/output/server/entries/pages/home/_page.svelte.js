@@ -1,5 +1,6 @@
 import { c as create_ssr_component, d as add_attribute, v as validate_component } from "../../../chunks/index2.js";
-/* empty css                                                        */const ConnectorClient = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+/* empty css                                                        */import "../../../chunks/stores2.js";
+const ConnectorClient = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let hostEmail = "";
   return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><label class="col" for="">Host Email </label>
                 <input class="col rounded" type="text"${add_attribute("value", hostEmail, 0)}></div>

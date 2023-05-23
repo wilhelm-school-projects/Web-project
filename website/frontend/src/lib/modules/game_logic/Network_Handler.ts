@@ -1,17 +1,17 @@
 
 import { get } from 'svelte/store'
-import { CONTEXTID } from '$lib/modules/stores'
+import { CONTEXTID, databaseHandler } from '$lib/modules/stores'
 import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
-
-import { database } from '$lib/modules/firebase'
-import { ref, set, update, onValue, get as fireGet, remove, type Unsubscribe } from "firebase/database";
+import { ref, set, update, onValue, get as fireGet, remove, type Unsubscribe, type Database } from "firebase/database";
 
 export class NetworkHandler {
     painter: Painter;
+    database: Database;
     stopShapeRetrieval: Unsubscribe;
 
     constructor(painter: Painter) {
         this.painter = painter;
+        this.database = get(databaseHandler)
     }
 
     async updateShapes(message: Object): Promise<boolean> {
@@ -40,17 +40,17 @@ export class NetworkHandler {
     async sendUpdate(message: Object, path: string) {
         let updates: { [key: string]: any } = {};
         updates[path] = message;
-        await update(ref(database), updates);
+        await update(ref(this.database), updates);
     }
     async sendSet(message: Object, path: string) {
-        await set(ref(database, path), message);
+        await set(ref(this.database, path), message);
     }
 
     initiateShapeRetrieval() {
         let contextPath: string = get(CONTEXTID) + '/shapes';
         let response: Object;
 
-        this.stopShapeRetrieval = onValue(ref(database, contextPath), (snapshot) => {
+        this.stopShapeRetrieval = onValue(ref(this.database, contextPath), (snapshot) => {
             let data = snapshot.val();
             if (data === null) {
                 data = {}
@@ -61,7 +61,7 @@ export class NetworkHandler {
 
     private async canvasIsControlled(path: string): Promise<boolean> {
         try {
-            let response = await fireGet(ref(database, path));
+            let response = await fireGet(ref(this.database, path));
             if (!response.exists()) {
                 return false;
             }
@@ -93,7 +93,7 @@ export class NetworkHandler {
 
             // Make sure we obtained the control
             try {
-                let response = await fireGet(ref(database, controlPath));
+                let response = await fireGet(ref(this.database, controlPath));
                 if (!response.exists()) {
                     reject("(requestCanvasControl) no email exists even though we tried to grab control")
                     return;
@@ -115,7 +115,7 @@ export class NetworkHandler {
 
     async removeCanvasControl() {
         let controlPath = get(CONTEXTID) + '/control'
-        await remove(ref(database, controlPath));
+        await remove(ref(this.database, controlPath));
     }
 
 

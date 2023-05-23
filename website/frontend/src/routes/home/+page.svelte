@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { slide } from "svelte/transition";
-	import Navbar from "$lib/components/NavbarHome.svelte";
 	import ConnectorClient from "$lib/components/ConnectorClient.svelte";
 	import ConnectorHost from "$lib/components/ConnectorHost.svelte";
+	import { authHandler, type FireAuth_Handler } from "$lib/modules/stores";
+	import { get } from "svelte/store";
+
+	let authHandlerShared = get(authHandler);
 </script>
 
 <main

@@ -1,6 +1,5 @@
-<!-- Probably redundant -->
 <script lang="ts">
-    let texts: string[] = ["Draw", "Clear", "dummy"];
+    let texts: string[] = ["Draw", "Clear", "Settings"];
 </script>
 
 <nav

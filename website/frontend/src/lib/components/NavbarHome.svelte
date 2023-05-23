@@ -1,30 +1,9 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { fuseAttributes } from "$lib/modules/DOMFunctions";
-
-	export let paths: string[];
-	export let texts: string[];
-
-	// How to make an array of function pointers ( not used unfortunately :( )
-	// let onclicks: { (): void }[] = []; // Array of functions to which on:click bind to, for each <a> element down below in html.
-
-	// function a1() {
-	// 	console.log('0');
-	// }
-	// function a2() {
-	// 	console.log('1');
-	// }
-	// function a3() {
-	// 	console.log('2');
-	// }
-	// These push's has to be outside of onMount because otherwise the
-	// on:click={onclicks.at(i)} will append nothing (I think) as the #each
-	// happens before onMount, I guess at the rendering and not the loading to
-	// DOM.
-	// onclicks.push(a1);
-	// onclicks.push(a2);
-	// onclicks.push(a3);
-	// on:click={onclicks.at(i)}
+	import ButtonLogout from "$lib/components/ButtonLogout.svelte";
+	let paths: string[] = ["/home", ""];
+	let texts: string[] = ["Settings", "I am bored"];
 
 	function initNavbar() {
 		let attributes = {
@@ -51,6 +30,7 @@
 			{texts[i]}
 		</a>
 	{/each}
+	<ButtonLogout />
 </nav>
 
 <style>

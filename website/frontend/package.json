@@ -37,6 +37,7 @@
 		"dotenv": "^16.0.3",
 		"firebase": "^9.22.0",
 		"firebaseui": "^6.0.2",
+		"page": "^1.11.6",
 		"set-interval-async": "^3.0.3"
 	}
 }
