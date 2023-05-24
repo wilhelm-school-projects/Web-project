@@ -1,4 +1,5 @@
 <script lang="ts">
+	import NavbarGame from "$lib/components/NavbarGame.svelte";
 	import { page } from "$app/stores";
 	import { onMount } from "svelte";
 	import { gameHandler } from "$lib/modules/stores";
@@ -22,6 +23,7 @@
 </script>
 
 <main class="game-container">
+	<NavbarGame />
 	<div class="row">
 		<h1 class="text-center col">{gameType}</h1>
 	</div>

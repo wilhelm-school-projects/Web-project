@@ -1,4 +1,5 @@
 <script lang="ts">
+	import NavbarHome from "$lib/components/NavbarHome.svelte";
 	import { slide } from "svelte/transition";
 	import ConnectorClient from "$lib/components/ConnectorClient.svelte";
 	import ConnectorHost from "$lib/components/ConnectorHost.svelte";
@@ -68,6 +69,8 @@
 	<div class="col-1 border bg-danger">
 		<div />
 	</div>
+
+	<NavbarHome />
 </main>
 
 <style>

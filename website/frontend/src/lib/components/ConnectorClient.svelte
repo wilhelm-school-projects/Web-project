@@ -9,8 +9,9 @@
 
     let client: ClientConnector = new ClientConnector();
     let canvasRoute: string = "/game/client";
-    let canvasID: string = "";
+    let canvasID: string = "context-id-1";
     let game: GameClient;
+    let firstClick: boolean = true;
 
     async function connectToCanvas() {
         closeModal("modal-game-type");
@@ -22,49 +23,45 @@
     onMount(() => {
         // Because goto doesn't work and I might not always want to directly
         // navigate on click to next page (need logic to handle the inputed
-        // data) I have to do this work around
+        // data) I have to do this work around and because event.target.href =
+        // "/game/client" doesn't work in async arrow function for some reason I
+        // have made this workaround with manually calling click(). That causes
+        // recursive issues..
         let anchor = document.getElementById("anchor-game");
         anchor?.addEventListener("click", async (event) => {
-            console.log("klickat på anchor");
             if (event.target === null) {
                 throw Error("event is null");
             }
-            closeModal("modal-game-type");
+            if (firstClick) {
+                console.log("klickat på anchor");
+                closeModal("modal-game-type");
 
-            gameHandler.set(new GameClient("game-canvas", canvasID));
-            game = get(gameHandler) as GameClient;
-            if (!(await game.canvasExists())) {
-                console.log("Canvas doesn't exist, do something about it");
+                gameHandler.set(new GameClient("game-canvas", canvasID));
+                game = get(gameHandler) as GameClient;
+                if (!(await game.canvasExists())) {
+                    console.log("Canvas doesn't exist, do something about it");
+                    return;
+                }
+                console.log("den finns!");
+                console.log(event.target);
+
+                firstClick = false; // I am not proud of this "solution"
+                event.target.click();
                 return;
             }
-            console.log("den finns!");
-            console.log(event.target);
-
-            // when this function is marked as async the event.target.href
-            // doesn't change page, therefore I force a new click which is
-            // recursive which makes me fucked
             event.target.href = "/game/client";
-            event.target.click();
         });
     });
 </script>
 
 <main>
-    <button
-        on:click={() => {
-            closeModal("modal-game-type");
-            gameHandler.set(new GameClient("game-canvas", canvasID));
-            console.log("goto!");
-            goto("/game/client");
-        }}
-    >
-        X
-    </button>
     <div class="row d-flex justify-content-center">
         <form class="row" action="">
             <div class="row">
                 <label class="col" for=""> Canvas Name </label>
-                <input class="col rounded" type="text" bind:value={canvasID} />
+                <!-- Use commented when done -->
+                <!-- <input class="col rounded" type="text" bind:value={canvasID} /> -->
+                <input class="col rounded" type="text" />
             </div>
             <div class="row">
                 <div class="col d-flex justify-content-center">
