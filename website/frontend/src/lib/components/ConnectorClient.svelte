@@ -1,24 +1,15 @@
 <script lang="ts">
-    import { ClientConnector } from "$lib/modules/ConnectToCanvas";
     import { closeModal } from "$lib/modules/DOMFunctions";
     import { get } from "svelte/store";
     import { gameHandler } from "$lib/modules/stores";
     import { GameClient } from "$lib/modules/game_logic/Game";
-    import { goto } from "$app/navigation";
     import { onMount } from "svelte";
 
-    let client: ClientConnector = new ClientConnector();
+    // let client: ClientConnector = new ClientConnector();
     let canvasRoute: string = "/game/client";
     let canvasID: string = "context-id-1";
     let game: GameClient;
     let firstClick: boolean = true;
-
-    async function connectToCanvas() {
-        closeModal("modal-game-type");
-        console.log("navigating to game/client from conenctorClient");
-        gameHandler.set(new GameClient("game-canvas", canvasID));
-        // await goto("/game/client");
-    }
 
     onMount(() => {
         // Because goto doesn't work and I might not always want to directly
@@ -27,7 +18,7 @@
         // "/game/client" doesn't work in async arrow function for some reason I
         // have made this workaround with manually calling click(). That causes
         // recursive issues..
-        let anchor = document.getElementById("anchor-game");
+        let anchor = document.getElementById("anchor-game-client");
         anchor?.addEventListener("click", async (event) => {
             if (event.target === null) {
                 throw Error("event is null");
@@ -49,7 +40,7 @@
                 event.target.click();
                 return;
             }
-            event.target.href = "/game/client";
+            event.target.href = canvasRoute;
         });
     });
 </script>
@@ -66,7 +57,7 @@
             <div class="row">
                 <div class="col d-flex justify-content-center">
                     <a
-                        id="anchor-game"
+                        id="anchor-game-client"
                         class="col text-center btn btn-outline-secondary"
                         href=""
                     >

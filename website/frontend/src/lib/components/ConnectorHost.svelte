@@ -1,36 +1,65 @@
 <script lang="ts">
-    import { HostConnector } from "$lib/modules/ConnectToCanvas";
+    import { ClientConnector } from "$lib/modules/ConnectToCanvas";
     import { closeModal } from "$lib/modules/DOMFunctions";
     import { get } from "svelte/store";
     import { gameHandler } from "$lib/modules/stores";
     import { GameHost } from "$lib/modules/game_logic/Game";
+    import { onMount } from "svelte";
 
-    let host: HostConnector = new HostConnector();
     let canvasRoute: string = "/game/host";
-    let canvasID: string = "";
+    let canvasID: string = "context-id-" + Math.round(Math.random() * 10000); // should be user input
+    let game: GameHost;
+    let firstClick: boolean = true;
 
-    // TODO: If canvasID already exists, do not closeModal and navigate to page.
-    // This will be tricky to solve
-    function connectToCanvas() {
-        closeModal("modal-game-type");
-        console.log("navigating to host from connectorhost");
-        gameHandler.set(new GameHost("game-canvas", canvasID));
-    }
+    onMount(() => {
+        // Because goto doesn't work and I might not always want to directly
+        // navigate on click to next page (need logic to handle the inputed
+        // data) I have to do this work around and because event.target.href =
+        // "/game/client" doesn't work in async arrow function for some reason I
+        // have made this workaround with manually calling click(). That causes
+        // recursive issues..
+        let anchor = document.getElementById("anchor-game-host");
+        anchor?.addEventListener("click", async (event) => {
+            if (event.target === null) {
+                throw Error("event is null");
+            }
+            if (firstClick) {
+                console.log("klickat på anchor");
+
+                gameHandler.set(new GameHost("game-canvas", canvasID));
+                game = get(gameHandler) as GameHost;
+                if (!(await game.canvasCreated())) {
+                    console.log("Canvas couldn't be created");
+                    return;
+                }
+                closeModal("modal-game-type");
+                console.log("den finns!");
+                console.log(event.target);
+
+                firstClick = false; // I am not proud of this "solution"
+                event.target.click();
+                return;
+            }
+            event.target.href = "/game/client";
+        });
+    });
 </script>
 
 <main>
     <div class="row d-flex justify-content-center">
         <form class="row" action="">
             <div class="row">
-                <label class="col" for="">Canvas Name </label>
-                <input class="col rounded" type="text" bind:value={canvasID} />
+                <label class="col" for=""> Canvas Name </label>
+                <!-- Use commented when done -->
+                <!-- <input class="col rounded" type="text" bind:value={canvasID} /> -->
+                <input class="col rounded" type="text" />
             </div>
             <div class="row">
                 <div class="col d-flex justify-content-center">
                     <a
+                        id="anchor-game-host"
                         class="col text-center btn btn-outline-secondary"
-                        href="/game/host"
-                        on:click={connectToCanvas}
+                        href=""
                     >
                         Host
                     </a>

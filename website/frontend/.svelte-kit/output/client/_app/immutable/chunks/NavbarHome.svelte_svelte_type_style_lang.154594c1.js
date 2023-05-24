@@ -1,1 +1,0 @@
-function s(e,o){let t=document.getElementById(e);t==null&&console.log("Trying to fuse attributes to "+e+", but it is null or undifined!");for(const[l,n]of Object.entries(o))t==null||t.setAttribute(l,n)}function a(e){let o=document.getElementById(e);document.getElementsByClassName("modal-backdrop")[0].remove(),o.style.display="none"}export{a as c,s as f};

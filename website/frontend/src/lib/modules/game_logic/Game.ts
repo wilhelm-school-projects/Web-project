@@ -5,7 +5,8 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 
 //TODO:
 //  4.  logic to connect / initate new canvas
-//  5.  Button to invite email to existing canvas
+//      - initiate canvas -> invite email to canvas
+//  5.  ^logic on server side
 //  7.  Clear canvas
 //  8.  Refreshing the page should not cause the person to log out or loose
 //      connection to current canvas. Low priority
@@ -70,6 +71,17 @@ export class Game {
             this.networker.removeCanvasControl()
         }
     }
+
+    async canvasExists(): Promise<boolean> {
+        let response: boolean;
+        try {
+            response = await this.networker.canvasExists();
+            return response
+        } catch (e) {
+            // maybe?
+            return (e as boolean);
+        }
+    }
 }
 
 export class GameHost extends Game {
@@ -84,6 +96,31 @@ export class GameHost extends Game {
     // Stuff that can't happen before mounting the game page
     run(): void {
         console.log("Host: running game")
+        this.settingsHandler.run();
+        this.painter.run();
+        this.networker.run();
+        this.initTransmissions();
+    }
+
+    async canvasCreated(): Promise<boolean> {
+        if (await this.canvasExists()) {
+            console.log("canvas already exists")
+            return false;
+        }
+
+        // let response: boolean;
+        try {
+            // response = await this.networker.canvasCreate();
+            await this.networker.canvasCreate();
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
+
+    invite(email: string): void {
+        console.log("(inside GameHost) inviting email: ")
+        console.log(email)
     }
 }
 
@@ -94,17 +131,6 @@ export class GameClient extends Game {
         this.painter = new Painter(gameCanvas, false)
         this.networker = new NetworkHandler(this.painter, this.canvasID);
         this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
-    }
-
-    async canvasExists(): Promise<boolean> {
-        let response: boolean;
-        try {
-            response = await this.networker.canvasExists();
-            return response
-        } catch (e) {
-            // maybe?
-            return (e as boolean);
-        }
     }
 
     // Stuff that can't happen before mounting the game page Order of method

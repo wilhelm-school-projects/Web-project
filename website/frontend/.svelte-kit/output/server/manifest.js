@@ -4,35 +4,34 @@ export const manifest = {
 	assets: new Set(["favicon.png"]),
 	mimeTypes: {".png":"image/png"},
 	_: {
-		client: {"start":{"file":"_app/immutable/entry/start.df90bf1b.js","imports":["_app/immutable/entry/start.df90bf1b.js","_app/immutable/chunks/index.71153ec7.js","_app/immutable/chunks/singletons.f5cdc87e.js","_app/immutable/chunks/index.60ac0192.js"],"stylesheets":[],"fonts":[]},"app":{"file":"_app/immutable/entry/app.8337d490.js","imports":["_app/immutable/entry/app.8337d490.js","_app/immutable/chunks/index.71153ec7.js"],"stylesheets":[],"fonts":[]}},
+		client: {"start":{"file":"_app/immutable/entry/start.4b83756d.js","imports":["_app/immutable/entry/start.4b83756d.js","_app/immutable/chunks/index.c5e23121.js","_app/immutable/chunks/singletons.afae1a6b.js"],"stylesheets":[],"fonts":[]},"app":{"file":"_app/immutable/entry/app.91517399.js","imports":["_app/immutable/entry/app.91517399.js","_app/immutable/chunks/index.c5e23121.js"],"stylesheets":[],"fonts":[]}},
 		nodes: [
 			() => import('./nodes/0.js'),
 			() => import('./nodes/1.js'),
-			() => import('./nodes/3.js'),
+			() => import('./nodes/2.js'),
 			() => import('./nodes/4.js'),
-			() => import('./nodes/6.js'),
-			() => import('./nodes/7.js')
+			() => import('./nodes/5.js')
 		],
 		routes: [
 			{
 				id: "/",
 				pattern: /^\/$/,
 				params: [],
-				page: { layouts: [0], errors: [1], leaf: 3 },
+				page: { layouts: [0], errors: [1], leaf: 2 },
 				endpoint: null
 			},
 			{
 				id: "/home",
 				pattern: /^\/home\/?$/,
 				params: [],
-				page: { layouts: [0,2], errors: [1,,], leaf: 4 },
+				page: { layouts: [0], errors: [1], leaf: 3 },
 				endpoint: null
 			},
 			{
 				id: "/home/settings",
 				pattern: /^\/home\/settings\/?$/,
 				params: [],
-				page: { layouts: [0,2], errors: [1,,], leaf: 5 },
+				page: { layouts: [0], errors: [1], leaf: 4 },
 				endpoint: null
 			}
 		],

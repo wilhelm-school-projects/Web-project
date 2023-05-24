@@ -1,20 +1,41 @@
-import { c as create_ssr_component, d as add_attribute, v as validate_component } from "../../../chunks/index2.js";
-/* empty css                                                        */import "../../../chunks/stores2.js";
+import { c as create_ssr_component, d as each, v as validate_component, e as escape, b as add_attribute, g as get_store_value } from "../../../chunks/index2.js";
+import { B as ButtonLogout } from "../../../chunks/ButtonLogout.js";
+import { a as authHandler } from "../../../chunks/stores2.js";
+import "firebase/database";
+import "set-interval-async";
+const NavbarHome_svelte_svelte_type_style_lang = "";
+const css = {
+  code: "#bottom-navbar.svelte-1d4vcpx{padding-bottom:1rem}",
+  map: null
+};
+const NavbarHome = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let paths = ["/home", ""];
+  let texts = ["Settings", "I am bored"];
+  $$result.css.add(css);
+  return `<nav id="bottom-navbar" class="navbar fixed-bottom row padding-bottom justify-content-center d-flex svelte-1d4vcpx">${each(paths, (path, i) => {
+    return `<a id="${"anchor-" + escape(path, true)}" class="col text-center btn btn-outline-secondary svelte-1d4vcpx"${add_attribute("href", path, 0)}>${escape(texts[i])}
+		</a>`;
+  })}
+	${validate_component(ButtonLogout, "ButtonLogout").$$render($$result, {}, {}, {})}
+</nav>`;
+});
 const ConnectorClient = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let hostEmail = "";
-  return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><label class="col" for="">Host Email </label>
-                <input class="col rounded" type="text"${add_attribute("value", hostEmail, 0)}></div>
-            <div class="row"><div class="col d-flex justify-content-center"><button class="row col text-center btn btn-outline-secondary">Connect
-                    </button></div></div></form></div></main>`;
+  return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><label class="col" for="">Canvas Name </label>
+                
+                
+                <input class="col rounded" type="text"></div>
+            <div class="row"><div class="col d-flex justify-content-center"><a id="anchor-game" class="col text-center btn btn-outline-secondary" href="">Connect
+                    </a></div></div></form></div></main>`;
 });
 const ConnectorHost = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let canvasName = "";
+  let canvasID = "";
   return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><label class="col" for="">Canvas Name </label>
-                <input class="col rounded" type="text"${add_attribute("value", canvasName, 0)}></div>
-            <div class="row"><div class="col d-flex justify-content-center"><button class="row col text-center btn btn-outline-secondary">Start Hosting
-                    </button></div></div></form></div></main>`;
+                <input class="col rounded" type="text"${add_attribute("value", canvasID, 0)}></div>
+            <div class="row"><div class="col d-flex justify-content-center"><a class="col text-center btn btn-outline-secondary" href="/game/host">Host
+                    </a></div></div></form></div></main>`;
 });
 const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  get_store_value(authHandler);
   return `<main class="row d-flex justify-content-center text-info">
 	<div id="modal-game-type" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Open drawing pane</h5>
 					
@@ -29,6 +50,8 @@ const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
 	<div class="col-1 border bg-danger"></div>
 	<div id="content" class="col bg-info text-white"><p class="display-2">ipsumquam ducimus</p></div>
 	<div class="col-1 border bg-danger"><div></div></div>
+
+	${validate_component(NavbarHome, "NavbarHome").$$render($$result, {}, {}, {})}
 </main>`;
 });
 export {

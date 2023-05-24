@@ -119,9 +119,9 @@ function add_attribute(name, value, boolean) {
 }
 export {
   subscribe as a,
-  each as b,
+  add_attribute as b,
   create_ssr_component as c,
-  add_attribute as d,
+  each as d,
   escape as e,
   getContext as f,
   get_store_value as g,

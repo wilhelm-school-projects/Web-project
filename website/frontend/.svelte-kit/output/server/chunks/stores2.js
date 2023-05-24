@@ -1,7 +1,14 @@
 import { r as readable, w as writable } from "./index.js";
-import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
+import "set-interval-async";
+import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "firebase/auth";
+function guard(name) {
+  return () => {
+    throw new Error(`Cannot call ${name}(...) on the server`);
+  };
+}
+const goto = guard("goto");
 readable("context-id-1");
 const firebaseConfig = {
   apiKey: "AIzaSyBMLLbj09IxQOez5cTlmApwZMSi_qyJfHc",
@@ -50,18 +57,17 @@ class FireAuth_Handler {
       console.log(e);
     }
     this.unsubscribeAuthStateChange = onAuthStateChanged(this.fireAuth, (user) => {
-      if (user)
-        ;
-      else {
-        console.log("Utloggad! :)");
-        window.location.href = "/";
+      if (user) {
+        goto("/home");
+      } else {
+        goto("/");
       }
     });
   }
   async signOut() {
     try {
-      await signOut(this.fireAuth);
-      console.log("loggar ut");
+      let response = await signOut(this.fireAuth);
+      goto("/");
     } catch (e) {
       console.log(e);
     }

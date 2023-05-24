@@ -3,18 +3,23 @@ import { get } from 'svelte/store'
 import { CONTEXTID, databaseHandler } from '$lib/modules/stores'
 import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
 import { ref, set, update, onValue, get as fireGet, remove, type Unsubscribe, type Database } from "firebase/database";
+import axios, { isCancel, AxiosError } from 'axios';
 
 export class NetworkHandler {
     painter: Painter;
     database: Database;
     canvasID: string;
-
+    // axiosInstance: AxiosInstance;
     stopShapeRetrieval: Unsubscribe;
 
     constructor(painter: Painter, canvasID: string) {
         this.canvasID = canvasID;
         this.painter = painter;
         this.database = get(databaseHandler)
+
+        // this.axiosInstance = axios.create({
+        //     baseURL: 'https://us-central1-montem-d8829.cloudfunctions.net/api',
+        // });
     }
 
     async updateShapes(message: Object): Promise<boolean> {
@@ -99,6 +104,7 @@ export class NetworkHandler {
         })
     }
 
+
     async requestCanvasControl(): Promise<string> {
         return new Promise(async (resolve, reject) => {
             let userEmail: string | null = localStorage.getItem("email");
@@ -149,4 +155,23 @@ export class NetworkHandler {
         this.initiateShapeRetrieval()
     }
 
+    // Requests to Cloud functions API
+    async canvasCreate(): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // let response = await axios.post('https://us-central1-montem-d8829.cloudfunctions.net/api/createNewCanvas', {
+                let response = await axios.post('http://localhost:5000/montem-d8829/us-central1/api/createNewCanvas', {
+                    firstName: 'Fred',
+                    lastName: 'Flintstone'
+                })
+                console.log("Svar från functions:")
+                console.log(response)
+            } catch (e) {
+                console.log(e)
+                reject(false)
+                return
+            }
+            resolve(true)
+        })
+    }
 }
