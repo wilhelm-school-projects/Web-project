@@ -3,6 +3,7 @@
 	import { onMount } from "svelte";
 	import { gameHandler } from "$lib/modules/stores";
 	import { get } from "svelte/store";
+	import type { GameHost, GameClient } from "$lib/modules/game_logic/Game";
 
 	// extract the game type from the url
 	let gameType: string = $page.url.href
@@ -11,7 +12,13 @@
 
 	// gameHandler is set to host or client at the component
 	// Connector(Host/Client) before routing to this page
-	let game = get(gameHandler);
+	let game: GameHost | GameClient;
+	onMount(() => {
+		game = get(gameHandler) as GameHost | GameClient;
+		console.log("Game:");
+		console.log(game);
+		game.run();
+	});
 </script>
 
 <main class="game-container">

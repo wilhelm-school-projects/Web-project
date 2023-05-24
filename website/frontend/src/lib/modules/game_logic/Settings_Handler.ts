@@ -14,32 +14,6 @@ export class SettingsHandler {
         this.painter = painter;
         this.Networker = Networker;
         this.game = game;
-        this.canvasWrapper = document.getElementById(
-            "canvas-wrapper"
-        ) as HTMLDivElement;
-        this.drawButton = document.getElementById("button-Draw-drawing-pane") as HTMLElement;
-
-        if (game instanceof GameClient) {
-            let canvasWrapper = document.getElementById(
-                "canvas-wrapper"
-            ) as HTMLDivElement;
-            canvasWrapper.style.pointerEvents = "none";
-            canvasWrapper.style.cursor = "not-allowed";
-
-        } else {
-
-        }
-
-        // Initiate button Event listeners
-        let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;
-        drawButton.addEventListener("click", async () => {
-            if (this.painter.controlsCanvas) {
-                this.lockCanvas();
-                await this.Networker.removeCanvasControl();
-            } else {
-                this.obtainCanvasControl();
-            }
-        })
     }
 
     async obtainCanvasControl() {
@@ -82,5 +56,35 @@ export class SettingsHandler {
         this.Networker.stopShapeRetrieval();
         this.painter.controlsCanvas = true;
         this.drawButton.style.backgroundColor = "green"
+    }
+
+    // Stuff that can't happen before mounting the game page
+    run(): void {
+        this.canvasWrapper = document.getElementById(
+            "canvas-wrapper"
+        ) as HTMLDivElement;
+        this.drawButton = document.getElementById("button-Draw-drawing-pane") as HTMLElement;
+
+        if (this.game instanceof GameClient) {
+            let canvasWrapper = document.getElementById(
+                "canvas-wrapper"
+            ) as HTMLDivElement;
+            canvasWrapper.style.pointerEvents = "none";
+            canvasWrapper.style.cursor = "not-allowed";
+
+        } else {
+
+        }
+
+        // Initiate button Event listeners
+        let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;
+        drawButton.addEventListener("click", async () => {
+            if (this.painter.controlsCanvas) {
+                this.lockCanvas();
+                await this.Networker.removeCanvasControl();
+            } else {
+                this.obtainCanvasControl();
+            }
+        })
     }
 }

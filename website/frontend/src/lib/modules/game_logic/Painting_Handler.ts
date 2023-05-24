@@ -91,7 +91,7 @@ export class Painter {
     xPosMouse: number;
     yPosMouse: number;
     currentShape: string;
-    controlsCanvas: boolean; // Should be initialized to false, but for development I keep true
+    controlsCanvas: boolean;
     hasPainted = false;
     stoppedPaintingJustNow = false;
     oldLengths: { [key: string]: number }
@@ -101,12 +101,23 @@ export class Painter {
 
     gamectx: CanvasRenderingContext2D;
     gameCanvas: HTMLCanvasElement;
+    gameCanvasString: string;
 
     constructor(gameCanvas: string, controlsCanvas: boolean) {
         this.controlsCanvas = controlsCanvas
+        this.gameCanvasString = gameCanvas
+
+        // Shapes and stuff
+        this.shapes = { rectangles: [], circles: [] };
+        this.currentShape = "circle";
+        this.oldLengths = { rectangles: 0, circles: 0 }
+    }
+
+    // Stuff that can't happen before mounting the game page
+    run(): void {
 
         // Canvas and context
-        this.gameCanvas = document.getElementById(gameCanvas) as HTMLCanvasElement;
+        this.gameCanvas = document.getElementById(this.gameCanvasString) as HTMLCanvasElement;
         if (this.gameCanvas == null) {
             throw new Error("Game Canvas is null!");
         }
@@ -124,13 +135,7 @@ export class Painter {
 
         this.gameCanvas.addEventListener('mousedown', (Event) => {
             this.drawInterval = setInterval(() => this.drawCurrentShape(Event), 50);
-            // this.drawCurrentShape(Event)
-            console.log("drraw")
         });
-
-        // this.gameCanvas.addEventListener('mousedown', (Event) => {
-        //     this.drawInterval = setInterval(() => this.drawCurrentShape(Event), 50);
-        // });
 
         this.gameCanvas.addEventListener('mouseup', () => {
             clearInterval(this.drawInterval);
@@ -139,11 +144,6 @@ export class Painter {
         this.gameCanvas.addEventListener('mouseout', () => {
             clearInterval(this.drawInterval);
         });
-
-        // Shapes and stuff
-        this.shapes = { rectangles: [], circles: [] };
-        this.currentShape = "circle";
-        this.oldLengths = { rectangles: 0, circles: 0 }
     }
 
     async updateHasPainted() {

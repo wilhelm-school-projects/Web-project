@@ -7,16 +7,19 @@ import { ref, set, update, onValue, get as fireGet, remove, type Unsubscribe, ty
 export class NetworkHandler {
     painter: Painter;
     database: Database;
+    canvasID: string;
+
     stopShapeRetrieval: Unsubscribe;
 
-    constructor(painter: Painter) {
+    constructor(painter: Painter, canvasID: string) {
+        this.canvasID = canvasID;
         this.painter = painter;
         this.database = get(databaseHandler)
     }
 
     async updateShapes(message: Object): Promise<boolean> {
         try {
-            let path = get(CONTEXTID) + '/shapes';
+            let path = this.canvasID + '/shapes';
             let response = await this.sendUpdate(message, path);
         } catch (e) {
             console.log("Update failed")
@@ -27,7 +30,7 @@ export class NetworkHandler {
     }
     async setShapes(message: Object): Promise<boolean> {
         try {
-            let response = await this.sendSet(message, get(CONTEXTID));
+            let response = await this.sendSet(message, this.canvasID);
             console.log("Set: successful")
         } catch (e) {
             console.log("Send shapes error:")
@@ -47,7 +50,7 @@ export class NetworkHandler {
     }
 
     initiateShapeRetrieval() {
-        let contextPath: string = get(CONTEXTID) + '/shapes';
+        let contextPath: string = this.canvasID + '/shapes';
         let response: Object;
 
         this.stopShapeRetrieval = onValue(ref(this.database, contextPath), (snapshot) => {
@@ -73,6 +76,29 @@ export class NetworkHandler {
         return true;
     }
 
+    async canvasExists(): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            console.log("looking if canvas exists in networker")
+
+            // This try catch could probably be extracted to a more general
+            // function shared by e.g., canvasIsControlled
+            let path: string = "/" + this.canvasID
+            try {
+                let response = await fireGet(ref(this.database, path))
+                if (!response.exists()) {
+                    reject(false)
+                    return;
+                }
+                // are we allowed etc.
+            } catch (e) {
+                console.log(e)
+                reject(false)
+                return;
+            }
+            resolve(true)
+        })
+    }
+
     async requestCanvasControl(): Promise<string> {
         return new Promise(async (resolve, reject) => {
             let userEmail: string | null = localStorage.getItem("email");
@@ -81,7 +107,7 @@ export class NetworkHandler {
                 return; // reject does not return the function
             }
             userEmail = encodeURIComponent(userEmail).replace('.', '%2E');
-            let controlPath = get(CONTEXTID) + '/control'
+            let controlPath = this.canvasID + '/control'
 
             // Check if anyone has control of the canvas
             if (await this.canvasIsControlled(controlPath)) {
@@ -114,9 +140,13 @@ export class NetworkHandler {
     }
 
     async removeCanvasControl() {
-        let controlPath = get(CONTEXTID) + '/control'
+        let controlPath = this.canvasID + '/control'
         await remove(ref(this.database, controlPath));
     }
 
+    // Stuff that can't happen before mounting the game page
+    run(): void {
+        this.initiateShapeRetrieval()
+    }
 
 }

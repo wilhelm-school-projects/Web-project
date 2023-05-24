@@ -14,22 +14,11 @@ export class Game {
     canvasID: string;
     painter: Painter;
     settingsHandler: SettingsHandler;
-    Networker: NetworkHandler;
+    networker: NetworkHandler;
     intervalAsyncTimer: any;
 
     constructor(canvasID: string) {
         this.canvasID = canvasID;
-
-        this.intervalAsyncTimer = setIntervalAsync(async () => {
-            await this.transmitShapes()
-        }, 50)
-
-        // Remove duplicates of shapes every 0.5 seconds
-        setInterval(() => {
-            if (this.painter.controlsCanvas) {
-                this.painter.thinCanvas()
-            }
-        }, 5000)
 
         window.onbeforeunload = () => {
             this.cleanUp()
@@ -48,20 +37,37 @@ export class Game {
         if (!this.painter.controlsCanvas || !this.painter.hasPainted) {
             return;
         }
-        this.painter.hasPainted = false; // transmitting changes, thus hasn't painted anything new now.
+        this.painter.hasPainted = false; // transmitting changes, thus hasn't painted anything from now on
         let message = this.painter.getShapes();
         try {
-            let response = await this.Networker.updateShapes(message);
+            let response = await this.networker.updateShapes(message);
         } catch (e) {
             console.log("Transimitting shapes didn't go as planned")
         }
     }
 
+    protected initTransmissions(): void {
+        this.intervalAsyncTimer = setIntervalAsync(async () => {
+            await this.transmitShapes()
+        }, 50)
+
+        // Remove duplicates of shapes every 0.5 seconds
+        setInterval(() => {
+            if (this.painter.controlsCanvas) {
+                this.painter.thinCanvas()
+            }
+        }, 5000)
+    }
+
+    // Stuff that can't happen before mounting the game page
+    run(): void {
+        // console.log("initCanvas")
+    }
 
     cleanUp(): void {
         clearIntervalAsync(this.intervalAsyncTimer);
         if (this.painter.controlsCanvas) {
-            this.Networker.removeCanvasControl()
+            this.networker.removeCanvasControl()
         }
     }
 }
@@ -71,10 +77,14 @@ export class GameHost extends Game {
     constructor(gameCanvas: string, canvasID: string) {
         super(canvasID);
         this.painter = new Painter(gameCanvas, true)
-        this.Networker = new NetworkHandler(this.painter);
-        this.settingsHandler = new SettingsHandler(this.painter, this.Networker, this);
+        this.networker = new NetworkHandler(this.painter, this.canvasID);
+        this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
     }
 
+    // Stuff that can't happen before mounting the game page
+    run(): void {
+        console.log("Host: running game")
+    }
 }
 
 export class GameClient extends Game {
@@ -82,8 +92,29 @@ export class GameClient extends Game {
     constructor(gameCanvas: string, canvasID: string) {
         super(canvasID);
         this.painter = new Painter(gameCanvas, false)
-        this.Networker = new NetworkHandler(this.painter);
-        this.settingsHandler = new SettingsHandler(this.painter, this.Networker, this);
-        this.Networker.initiateShapeRetrieval();
+        this.networker = new NetworkHandler(this.painter, this.canvasID);
+        this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
+    }
+
+    async canvasExists(): Promise<boolean> {
+        let response: boolean;
+        try {
+            response = await this.networker.canvasExists();
+            return response
+        } catch (e) {
+            // maybe?
+            return (e as boolean);
+        }
+    }
+
+    // Stuff that can't happen before mounting the game page Order of method
+    // calls is important because some objects need to run before to initialize
+    // som stuff other objects need
+    run(): void {
+        console.log("Client: running game")
+        this.settingsHandler.run();
+        this.painter.run();
+        this.networker.run();
+        this.initTransmissions();
     }
 }
