@@ -1,7 +1,6 @@
 import { r as readable, w as writable } from "./index.js";
-import { getDatabase } from "firebase/database";
-import "set-interval-async";
 import { initializeApp } from "firebase/app";
+import { getDatabase } from "firebase/database";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "firebase/auth";
 function guard(name) {
   return () => {
@@ -10,6 +9,7 @@ function guard(name) {
 }
 const goto = guard("goto");
 readable("context-id-1");
+const gameHandler = writable();
 const firebaseConfig = {
   apiKey: "AIzaSyBMLLbj09IxQOez5cTlmApwZMSi_qyJfHc",
   authDomain: "montem-d8829.firebaseapp.com",
@@ -22,7 +22,7 @@ const firebaseConfig = {
 };
 const firebaseApp = initializeApp(firebaseConfig);
 const initDatabase = getDatabase(firebaseApp);
-readable(initDatabase);
+let databaseHandler = readable(initDatabase);
 class FireAuth_Handler {
   userCredentials;
   user;
@@ -35,7 +35,6 @@ class FireAuth_Handler {
     this.fireAuth = getAuth(firebaseApp);
   }
   async signIn(errorHandler) {
-    console.log("hejhej");
     if (await this.inputsAreEmpty()) {
       return;
     }
@@ -50,8 +49,6 @@ class FireAuth_Handler {
         this.userEmail,
         this.password
       );
-      console.log("har loggat in:");
-      console.log(this);
     } catch (e) {
       errorHandler();
       console.log(e);
@@ -115,7 +112,9 @@ class FireAuth_Handler {
   }
 }
 let initHandler = new FireAuth_Handler();
-const authHandler = writable(initHandler);
+const authHandlerShared = writable(initHandler);
 export {
-  authHandler as a
+  authHandlerShared as a,
+  databaseHandler as d,
+  gameHandler as g
 };

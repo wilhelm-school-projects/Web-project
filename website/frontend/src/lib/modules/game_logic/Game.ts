@@ -2,6 +2,7 @@ import { Rectangle, Circle, Painter } from '$lib/modules/game_logic/Painting_Han
 import { SettingsHandler } from '$lib/modules/game_logic/Settings_Handler'
 import { NetworkHandler } from '$lib/modules/game_logic/Network_Handler'
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
+import type { FireAuth_Handler } from '../stores';
 
 //TODO:
 //  4.  logic to connect / initate new canvas
@@ -10,6 +11,7 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 //  7.  Clear canvas
 //  8.  Refreshing the page should not cause the person to log out or loose
 //      connection to current canvas. Low priority
+//  9.  use logged in user email instead of localstorage (see network)
 
 export class Game {
     canvasID: string;
@@ -86,10 +88,10 @@ export class Game {
 
 export class GameHost extends Game {
 
-    constructor(gameCanvas: string, canvasID: string) {
+    constructor(gameCanvas: string, canvasID: string, authHandler: FireAuth_Handler) {
         super(canvasID);
         this.painter = new Painter(gameCanvas, true)
-        this.networker = new NetworkHandler(this.painter, this.canvasID);
+        this.networker = new NetworkHandler(this.painter, this.canvasID, authHandler);
         this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
     }
 
@@ -110,9 +112,10 @@ export class GameHost extends Game {
 
         // let response: boolean;
         try {
-            // response = await this.networker.canvasCreate();
-            await this.networker.canvasCreate();
+            await this.networker.requestCanvasControl() // create the new canvas path in database and make host control it from start
+            await this.networker.setUserCanvasClaims();
         } catch (e) {
+            console.log(e)
             return false;
         }
         return true;
@@ -126,10 +129,10 @@ export class GameHost extends Game {
 
 export class GameClient extends Game {
 
-    constructor(gameCanvas: string, canvasID: string) {
+    constructor(gameCanvas: string, canvasID: string, authHandler: FireAuth_Handler) {
         super(canvasID);
         this.painter = new Painter(gameCanvas, false)
-        this.networker = new NetworkHandler(this.painter, this.canvasID);
+        this.networker = new NetworkHandler(this.painter, this.canvasID, authHandler);
         this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
     }
 

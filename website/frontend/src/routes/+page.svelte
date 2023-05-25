@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
     import { slide, fade } from "svelte/transition";
-    import { authHandler } from "$lib/modules/stores";
+    import { authHandlerShared } from "$lib/modules/stores";
     import { get } from "svelte/store";
     import { goto } from "$app/navigation";
 
@@ -34,13 +34,13 @@
         ) as HTMLButtonElement;
 
         signUpBtn.addEventListener("click", async () => {
-            get(authHandler).signUp(() => {
+            get(authHandlerShared).signUp(() => {
                 showModal();
             });
         });
 
         signInBtn.addEventListener("click", async () => {
-            get(authHandler).signIn(() => {
+            get(authHandlerShared).signIn(() => {
                 showModal();
             });
         });
@@ -51,8 +51,8 @@
     }
 
     $: {
-        get(authHandler).setEmail(userEmail);
-        get(authHandler).setPassword(password);
+        get(authHandlerShared).setEmail(userEmail);
+        get(authHandlerShared).setPassword(password);
     }
 
     onMount(async () => {

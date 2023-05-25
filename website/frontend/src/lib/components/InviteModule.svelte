@@ -27,7 +27,7 @@
 </button>
 <input
     type="email"
-    class="col text-secondary btn-outline-danger"
+    class="col text-secondary input-outline-danger"
     bind:value={inviteEmail}
 />
 

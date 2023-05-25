@@ -20,6 +20,7 @@ app.use(cors())
 initializeApp()
 
 
+// This doesn't trigger for some reason
 exports.onCreate = functions.auth.user().onCreate(async (user) => {
     log("Functions")
     log(user)
@@ -27,10 +28,10 @@ exports.onCreate = functions.auth.user().onCreate(async (user) => {
 
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Igen!');
+    res.send('Nothing much here');
 });
 
-app.post('/createNewCanvas', (req: Request, res: Response) => {
+app.post('/setUserClaimsNewCanvas', (req: Request, res: Response) => {
     let data = req.body;
     log("user token id:")
     log(data)

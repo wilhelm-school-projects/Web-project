@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ClientConnector } from "$lib/modules/ConnectToCanvas";
+    import { FireAuth_Handler, authHandlerShared } from "$lib/modules/stores";
     import { closeModal } from "$lib/modules/DOMFunctions";
     import { get } from "svelte/store";
     import { gameHandler } from "$lib/modules/stores";
@@ -10,6 +10,7 @@
     let canvasID: string = "context-id-" + Math.round(Math.random() * 10000); // should be user input
     let game: GameHost;
     let firstClick: boolean = true;
+    let authHandler: FireAuth_Handler = get(authHandlerShared);
 
     onMount(() => {
         // Because goto doesn't work and I might not always want to directly
@@ -24,23 +25,21 @@
                 throw Error("event is null");
             }
             if (firstClick) {
-                console.log("klickat på anchor");
-
-                gameHandler.set(new GameHost("game-canvas", canvasID));
+                gameHandler.set(
+                    new GameHost("game-canvas", canvasID, authHandler)
+                );
                 game = get(gameHandler) as GameHost;
                 if (!(await game.canvasCreated())) {
                     console.log("Canvas couldn't be created");
                     return;
                 }
                 closeModal("modal-game-type");
-                console.log("den finns!");
-                console.log(event.target);
 
                 firstClick = false; // I am not proud of this "solution"
                 event.target.click();
                 return;
             }
-            event.target.href = "/game/client";
+            event.target.href = canvasRoute;
         });
     });
 </script>

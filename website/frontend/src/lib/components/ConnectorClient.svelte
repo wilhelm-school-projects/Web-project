@@ -1,7 +1,11 @@
 <script lang="ts">
     import { closeModal } from "$lib/modules/DOMFunctions";
     import { get } from "svelte/store";
-    import { gameHandler } from "$lib/modules/stores";
+    import {
+        FireAuth_Handler,
+        authHandlerShared,
+        gameHandler,
+    } from "$lib/modules/stores";
     import { GameClient } from "$lib/modules/game_logic/Game";
     import { onMount } from "svelte";
 
@@ -10,6 +14,7 @@
     let canvasID: string = "context-id-1";
     let game: GameClient;
     let firstClick: boolean = true;
+    let authHandler: FireAuth_Handler = get(authHandlerShared);
 
     onMount(() => {
         // Because goto doesn't work and I might not always want to directly
@@ -24,17 +29,16 @@
                 throw Error("event is null");
             }
             if (firstClick) {
-                console.log("klickat på anchor");
                 closeModal("modal-game-type");
 
-                gameHandler.set(new GameClient("game-canvas", canvasID));
+                gameHandler.set(
+                    new GameClient("game-canvas", canvasID, authHandler)
+                );
                 game = get(gameHandler) as GameClient;
                 if (!(await game.canvasExists())) {
                     console.log("Canvas doesn't exist, do something about it");
                     return;
                 }
-                console.log("den finns!");
-                console.log(event.target);
 
                 firstClick = false; // I am not proud of this "solution"
                 event.target.click();

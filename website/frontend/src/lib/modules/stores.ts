@@ -1,8 +1,4 @@
 import { readable, writable } from 'svelte/store'
-import {
-    GameHost,
-    GameClient
-} from './game_logic/Game';
 
 export const CONTEXTID = readable("context-id-1");
 
@@ -40,7 +36,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 //databaseHandler is shared between components which subscribe to it
 const initDatabase = getDatabase(firebaseApp);
-export let databaseHandler = readable(initDatabase)
+export let databaseHandler = readable(initDatabase);
 
 export class FireAuth_Handler {
 
@@ -58,7 +54,6 @@ export class FireAuth_Handler {
     }
 
     async signIn(errorHandler: () => any) {
-        console.log("hejhej")
         if (await this.inputsAreEmpty()) {
             return;
         }
@@ -74,8 +69,6 @@ export class FireAuth_Handler {
                 this.userEmail,
                 this.password
             );
-            console.log("har loggat in:")
-            console.log(this)
 
         } catch (e) {
             errorHandler();
@@ -158,6 +151,6 @@ export class FireAuth_Handler {
     }
 }
 
-//authHandler is shared between components which subscribe to it
+//authHandlerShared is shared between components which subscribe to it
 let initHandler = new FireAuth_Handler();
-export const authHandler = writable(initHandler)
+export const authHandlerShared = writable(initHandler)

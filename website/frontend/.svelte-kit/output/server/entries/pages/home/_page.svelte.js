@@ -1,6 +1,6 @@
 import { c as create_ssr_component, d as each, v as validate_component, e as escape, b as add_attribute, g as get_store_value } from "../../../chunks/index2.js";
 import { B as ButtonLogout } from "../../../chunks/ButtonLogout.js";
-import { a as authHandler } from "../../../chunks/stores2.js";
+import { a as authHandlerShared } from "../../../chunks/stores2.js";
 import "firebase/database";
 import "set-interval-async";
 const NavbarHome_svelte_svelte_type_style_lang = "";
@@ -20,22 +20,24 @@ const NavbarHome = create_ssr_component(($$result, $$props, $$bindings, slots) =
 </nav>`;
 });
 const ConnectorClient = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  get_store_value(authHandlerShared);
   return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><label class="col" for="">Canvas Name </label>
                 
                 
                 <input class="col rounded" type="text"></div>
-            <div class="row"><div class="col d-flex justify-content-center"><a id="anchor-game" class="col text-center btn btn-outline-secondary" href="">Connect
+            <div class="row"><div class="col d-flex justify-content-center"><a id="anchor-game-client" class="col text-center btn btn-outline-secondary" href="">Connect
                     </a></div></div></form></div></main>`;
 });
 const ConnectorHost = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  let canvasID = "";
+  get_store_value(authHandlerShared);
   return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><label class="col" for="">Canvas Name </label>
-                <input class="col rounded" type="text"${add_attribute("value", canvasID, 0)}></div>
-            <div class="row"><div class="col d-flex justify-content-center"><a class="col text-center btn btn-outline-secondary" href="/game/host">Host
+                
+                
+                <input class="col rounded" type="text"></div>
+            <div class="row"><div class="col d-flex justify-content-center"><a id="anchor-game-host" class="col text-center btn btn-outline-secondary" href="">Host
                     </a></div></div></form></div></main>`;
 });
 const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  get_store_value(authHandler);
   return `<main class="row d-flex justify-content-center text-info">
 	<div id="modal-game-type" class="modal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Open drawing pane</h5>
 					

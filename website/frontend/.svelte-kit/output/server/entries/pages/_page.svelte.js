@@ -1,12 +1,12 @@
 import { c as create_ssr_component, g as get_store_value, b as add_attribute } from "../../chunks/index2.js";
-import { a as authHandler } from "../../chunks/stores2.js";
+import { a as authHandlerShared } from "../../chunks/stores2.js";
 const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let userEmail;
   let password;
   {
     {
-      get_store_value(authHandler).setEmail(userEmail);
-      get_store_value(authHandler).setPassword(password);
+      get_store_value(authHandlerShared).setEmail(userEmail);
+      get_store_value(authHandlerShared).setPassword(password);
     }
   }
   return `

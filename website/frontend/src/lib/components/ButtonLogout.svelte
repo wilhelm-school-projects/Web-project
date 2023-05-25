@@ -1,14 +1,11 @@
 <script lang="ts">
-    import { authHandler } from "$lib/modules/stores";
+    import { authHandlerShared } from "$lib/modules/stores";
     import { get } from "svelte/store";
 
-    let authHandlerShared = get(authHandler);
+    let authHandler = get(authHandlerShared);
 
     function signOut() {
-        console.log("button signOut");
-        console.log(authHandlerShared);
-
-        authHandlerShared.signOut();
+        authHandler.signOut();
     }
 </script>
 

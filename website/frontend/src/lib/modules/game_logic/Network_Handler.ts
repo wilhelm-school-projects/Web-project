@@ -1,25 +1,30 @@
 
 import { get } from 'svelte/store'
-import { CONTEXTID, databaseHandler } from '$lib/modules/stores'
+import { type FireAuth_Handler, databaseHandler } from '$lib/modules/stores'
 import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
 import { ref, set, update, onValue, get as fireGet, remove, type Unsubscribe, type Database } from "firebase/database";
-import axios, { isCancel, AxiosError } from 'axios';
+import axios, { isCancel, AxiosError, type AxiosInstance } from 'axios';
 
 export class NetworkHandler {
     painter: Painter;
     database: Database;
     canvasID: string;
-    // axiosInstance: AxiosInstance;
+    userEmail: string;
+    authHandler: FireAuth_Handler;
+    axiosInstance: AxiosInstance;
     stopShapeRetrieval: Unsubscribe;
 
-    constructor(painter: Painter, canvasID: string) {
+    constructor(painter: Painter, canvasID: string, authHandler: FireAuth_Handler) {
         this.canvasID = canvasID;
         this.painter = painter;
+        this.authHandler = authHandler;
+        this.userEmail = this.authHandler.userCredentials?.user.email as string;
+        this.userEmail = this.authHandler.userEmail
         this.database = get(databaseHandler)
-
-        // this.axiosInstance = axios.create({
-        //     baseURL: 'https://us-central1-montem-d8829.cloudfunctions.net/api',
-        // });
+        this.axiosInstance = axios.create({
+            baseURL: 'https://us-central1-montem-d8829.cloudfunctions.net/api'  // prod
+            // baseURL: 'http://localhost:5000/montem-d8829/us-central1/api',   // dev
+        });
     }
 
     async updateShapes(message: Object): Promise<boolean> {
@@ -51,6 +56,10 @@ export class NetworkHandler {
         await update(ref(this.database), updates);
     }
     async sendSet(message: Object, path: string) {
+        console.log("skickar i sendSet message:")
+        console.log(message)
+        console.log("skickar i sendSet path:")
+        console.log(path)
         await set(ref(this.database, path), message);
     }
 
@@ -107,12 +116,9 @@ export class NetworkHandler {
 
     async requestCanvasControl(): Promise<string> {
         return new Promise(async (resolve, reject) => {
-            let userEmail: string | null = localStorage.getItem("email");
-            if (userEmail === null) {
-                reject("(reuquestCanvasControl) user email doens't exist in localstorage")
-                return; // reject does not return the function
-            }
-            userEmail = encodeURIComponent(userEmail).replace('.', '%2E');
+            let userEmailEncoded: string | null;
+            userEmailEncoded = encodeURIComponent(this.userEmail).replace('.', '%2E');
+
             let controlPath = this.canvasID + '/control'
 
             // Check if anyone has control of the canvas
@@ -121,7 +127,7 @@ export class NetworkHandler {
                 return;
             }
 
-            await this.sendUpdate(userEmail, controlPath);
+            await this.sendUpdate(userEmailEncoded, controlPath);
 
             // Make sure we obtained the control
             try {
@@ -132,7 +138,7 @@ export class NetworkHandler {
 
                 }
                 let email = response.val()
-                if (email !== userEmail) {
+                if (email !== userEmailEncoded) {
                     // Someone else was quicker to grab the control
                     reject("Another user controls the canvas")
                     return
@@ -156,15 +162,16 @@ export class NetworkHandler {
     }
 
     // Requests to Cloud functions API
-    async canvasCreate(): Promise<boolean> {
+    async setUserCanvasClaims(): Promise<boolean> {
+        console.log("auth handle i set canvas claims")
+        console.log(this.authHandler)
         return new Promise(async (resolve, reject) => {
             try {
-                // let response = await axios.post('https://us-central1-montem-d8829.cloudfunctions.net/api/createNewCanvas', {
-                let response = await axios.post('http://localhost:5000/montem-d8829/us-central1/api/createNewCanvas', {
-                    firstName: 'Fred',
-                    lastName: 'Flintstone'
+                let response = await this.axiosInstance.post('/setUserClaimsNewCanvas', {
+                    userID: this.authHandler.userCredentials?.user.uid,
+                    canvasID: this.canvasID
                 })
-                console.log("Svar från functions:")
+                console.log("setuserclaims response:")
                 console.log(response)
             } catch (e) {
                 console.log(e)
