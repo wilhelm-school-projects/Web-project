@@ -28,8 +28,8 @@ app.get('/', (req: Request, res: Response) => {
 
 
 exports.processSignUp = functions.auth.user().onCreate(async (user) => {
-    log("user in processSignUp:")
-    log(user)
+    console.log("user in processSignUp:")
+    console.log(user)
 
     try {
         // Set custom user claims on this newly created user.
@@ -40,13 +40,13 @@ exports.processSignUp = functions.auth.user().onCreate(async (user) => {
 
         // let updates: { [key: string]: any } = {};
         let canvasID: string = "canvas-id-" + Math.round(Math.random() * 10000);
-        log("canvasID")
-        log(canvasID)
+        console.log("canvasID")
+        console.log(canvasID)
         let userEmailEncoded = encodeURIComponent(user.email as string).replace('.', '%2E');
-        log("encoded")
-        log(userEmailEncoded)
-        log("getAuth return value: ")
-        log(getAuth())
+        console.log("encoded")
+        console.log(userEmailEncoded)
+        console.log("getAuth return value: ")
+        console.log(getAuth())
         let newCanvas = { [canvasID]: { owner: userEmailEncoded } }
         let newUser = { [userEmailEncoded]: { ownCanvas: canvasID } }
         const rootRef = db.ref('/');
@@ -69,8 +69,16 @@ exports.processSignUp = functions.auth.user().onCreate(async (user) => {
             }
         })
 
-        await claimCanvas(canvasID, user.email as string)
-
+        // await claimCanvas(canvasID, user.email as string)
+        console.log("calling claimcanvas:")
+        console.log(canvasID + " " + user.email)
+        // await claimCanvas(canvasID, user.email as string)
+        claimCanvas(canvasID, user.email as string).then(() => {
+            console.log("done with calling claimcanvas")
+        }).catch((e: Error) => {
+            console.log("Error in processSignUp")
+            console.log(e)
+        })
         // Set user permissions to read / write to canvas. Prob do in a function
         // so it can be used when inviting new users
 
@@ -93,7 +101,11 @@ exports.processSignUp = functions.auth.user().onCreate(async (user) => {
 });
 
 async function claimCanvas(canvasID: string, email: string) {
+    // rulesJSON.rules gives me what object I want, change to that!!
     let rules: any;
+    rules = await db.getRulesJSON()
+    console.log("rules:")
+    console.log(rules)
     // For some reason await doesn't work here
     // log(await db.getRulesJSON())
     // try {
@@ -102,54 +114,77 @@ async function claimCanvas(canvasID: string, email: string) {
     //     console.log("getUlresJSON didnt work:")
     //     console.log(e)
     // }
-    db.getRulesJSON().then((json: any) => {
-        console.log("i then")
-        console.log(json)
+
+    // Get database rules
+    db.getRulesJSON().then((rulesJSON: any) => {
+        log("(console) i then")
+        console.log(rulesJSON)
+        rules = rulesJSON
+
+        console.log("old rules:")
+        log(rules)
+        if (!rules.hasOwnProperty('users')) {
+            console.log("doesn't have users key")
+            rules.users = {}
+            console.log("Now it does:")
+            console.log(rules)
+        } else {
+            console.log("(console) hej den har nyckeln")
+        }
+
+        if (!rulesJSON.rules.hasOwnProperty('users')) {
+            console.log("no variable doesn't have users key")
+            rules.users = {}
+            console.log("no variable Now it does:")
+            console.log(rulesJSON.rules)
+        } else {
+            console.log("no variable it actually did have the key:")
+            console.log(rulesJSON.rules)
+        }
+
+
+        let readWrite = {
+            ".read": "true",
+            ".write": "true"
+        }
+        let encodedEmail = encodeURIComponent(email).replace('.', '%2E')
+
+        rules.users[encodedEmail] = readWrite
+        rules[canvasID] = readWrite
+        console.log("new rules:")
+        console.log(rules)
+
+        // let canvasAccessRules = {
+        //     rules: {
+        //         [canvasID]: {
+        //             ".read": "true",
+        //             ".write": "true"
+        //         },
+        //         "users": {
+        //             [encodedEmail]: {
+        //                 ".read": "true",
+        //                 ".write": "true"
+        //             }
+        //         }
+        //     }
+        // }
+        // try {
+        //     await db.setRules(rules);
+        // } catch (e) {
+        //     console.error("Error updating rules:", e);
+        // }
+        db.setRules(rules).then().catch((e: Error) => {
+            console.log("Error in setRules:", e)
+        })
+        db.getRules().then((rules: string) => {
+            console.log("After, rules in database:")
+            console.log(rules)
+        })
     }).catch((err: Error) => {
-        console.log("i then error")
+        console.log("Error in getrulesJSON:")
         console.log(err)
     })
-    log("old rules:")
-    log(rules)
-    if (!rules.hasOwnProperty('users')) {
-        log("doesn't have users key")
-        rules.users = {}
-        log("Now it does:")
-        log(rules)
-    }
 
-    let readWrite = {
-        ".read": "true",
-        ".write": "true"
-    }
-    let encodedEmail = encodeURIComponent(email).replace('.', '%2E')
-
-    rules.users[encodedEmail] = readWrite
-    rules[canvasID] = readWrite
-    log("new rules:")
-    log(rules)
-
-    // let canvasAccessRules = {
-    //     rules: {
-    //         [canvasID]: {
-    //             ".read": "true",
-    //             ".write": "true"
-    //         },
-    //         "users": {
-    //             [encodedEmail]: {
-    //                 ".read": "true",
-    //                 ".write": "true"
-    //             }
-    //         }
-    //     }
-    // }
-    try {
-        await db.setRules(rules);
-    } catch (e) {
-        console.error("Error updating rules:", e);
-    }
-    log("After, rules in database:")
-    log(await db.getRules())
 }
 
 // should get in body: email, canvas id 
