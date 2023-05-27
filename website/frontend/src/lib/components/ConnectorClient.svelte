@@ -11,7 +11,7 @@
 
     // let client: ClientConnector = new ClientConnector();
     let canvasRoute: string = "/game/client";
-    let canvasID: string = "context-id-1";
+    let canvasID: string = "";
     let game: GameClient;
     let firstClick: boolean = true;
     let authHandler: FireAuth_Handler = get(authHandlerShared);
@@ -35,8 +35,9 @@
                     new GameClient("game-canvas", canvasID, authHandler)
                 );
                 game = get(gameHandler) as GameClient;
+                // "canvasExists" is misleading. But anyhow.. We couldn't connect to it anyways..
                 if (!(await game.canvasExists())) {
-                    console.log("Canvas doesn't exist, do something about it");
+                    console.log("Couldn't connect to canvas");
                     return;
                 }
 
@@ -54,9 +55,7 @@
         <form class="row" action="">
             <div class="row">
                 <label class="col" for=""> Canvas Name </label>
-                <!-- Use commented when done -->
-                <!-- <input class="col rounded" type="text" bind:value={canvasID} /> -->
-                <input class="col rounded" type="text" />
+                <input class="col rounded" type="text" bind:value={canvasID} />
             </div>
             <div class="row">
                 <div class="col d-flex justify-content-center">

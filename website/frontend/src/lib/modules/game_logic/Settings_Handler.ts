@@ -58,6 +58,8 @@ export class SettingsHandler {
         this.drawButton.style.backgroundColor = "green"
     }
 
+
+
     // Stuff that can't happen before mounting the game page
     run(): void {
         this.canvasWrapper = document.getElementById(
@@ -65,20 +67,20 @@ export class SettingsHandler {
         ) as HTMLDivElement;
         this.drawButton = document.getElementById("button-Draw-drawing-pane") as HTMLElement;
 
-        if (this.game instanceof GameClient) {
-            let canvasWrapper = document.getElementById(
-                "canvas-wrapper"
-            ) as HTMLDivElement;
-            canvasWrapper.style.pointerEvents = "none";
-            canvasWrapper.style.cursor = "not-allowed";
+        // if (this.game instanceof GameClient) {
+        let canvasWrapper = document.getElementById(
+            "canvas-wrapper"
+        ) as HTMLDivElement;
+        canvasWrapper.style.pointerEvents = "none";
+        canvasWrapper.style.cursor = "not-allowed";
 
-        } else {
-
-        }
+        // } else {
+        //     this.drawButtonGreen()
+        // }
 
         // Initiate button Event listeners
-        let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;
-        drawButton.addEventListener("click", async () => {
+        // let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;
+        this.drawButton.addEventListener("click", async () => {
             if (this.painter.controlsCanvas) {
                 this.lockCanvas();
                 await this.Networker.removeCanvasControl();
@@ -86,5 +88,9 @@ export class SettingsHandler {
                 this.obtainCanvasControl();
             }
         })
+
+    }
+    drawButtonGreen(): void {
+        this.drawButton.style.backgroundColor = "green"
     }
 }

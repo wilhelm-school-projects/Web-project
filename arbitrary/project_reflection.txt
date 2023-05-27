@@ -1,1 +1,4 @@
 Använda firebase emulator
+
+GameHost och GameClient är så pass lika att det borde vara samma. Det är dock
+lite bättre utvecklingspotential om man separerar dom.

@@ -72,6 +72,7 @@ export class FireAuth_Handler {
 
         } catch (e) {
             errorHandler();
+            console.log("felfelfel:")
             console.log(e);
         }
 

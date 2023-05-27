@@ -5,6 +5,8 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import type { FireAuth_Handler } from '../stores';
 
 //TODO:
+//  1.  Same as 4. but create a canvas in database for every newly created user
+//      and let that user get read / write privilages.
 //  4.  logic to connect / initate new canvas
 //      - initiate canvas -> invite email to canvas
 //  5.  ^logic on server side
@@ -12,16 +14,18 @@ import type { FireAuth_Handler } from '../stores';
 //  8.  Refreshing the page should not cause the person to log out or loose
 //      connection to current canvas. Low priority
 //  9.  use logged in user email instead of localstorage (see network)
+//  10. Set custom name to canvas so it is not required to invite with the generated canvas id
+//  11. (inside connector(Host/Client) change so the constructor load canvas id and throws error if not successful)
 
 export class Game {
+    // Might not need to save canvasID in Game
     canvasID: string;
     painter: Painter;
     settingsHandler: SettingsHandler;
     networker: NetworkHandler;
     intervalAsyncTimer: any;
 
-    constructor(canvasID: string) {
-        this.canvasID = canvasID;
+    constructor() {
 
         window.onbeforeunload = () => {
             this.cleanUp()
@@ -88,37 +92,37 @@ export class Game {
 
 export class GameHost extends Game {
 
-    constructor(gameCanvas: string, canvasID: string, authHandler: FireAuth_Handler) {
-        super(canvasID);
-        this.painter = new Painter(gameCanvas, true)
-        this.networker = new NetworkHandler(this.painter, this.canvasID, authHandler);
+    constructor(gameCanvas: string, authHandler: FireAuth_Handler) {
+        super();
+        this.painter = new Painter(gameCanvas, false)
+        this.networker = new NetworkHandler(this.painter, authHandler);
         this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
     }
 
     // Stuff that can't happen before mounting the game page
-    run(): void {
+    async run() {
         console.log("Host: running game")
         this.settingsHandler.run();
         this.painter.run();
+        await this.networker.loadCanvasID()
         this.networker.run();
         this.initTransmissions();
     }
 
-    async canvasCreated(): Promise<boolean> {
-        if (await this.canvasExists()) {
-            console.log("canvas already exists")
-            return false;
-        }
-
-        // let response: boolean;
+    async initiateCanvas(): Promise<boolean> {
+        let itWentFine: boolean = false;
         try {
-            await this.networker.requestCanvasControl() // create the new canvas path in database and make host control it from start
-            await this.networker.setUserCanvasClaims();
+            await this.networker.loadCanvasID();
+            this.canvasID = this.networker.canvasID
+            console.log(this.canvasID)
+            console.log(" ")
+            console.log(this.networker.canvasID)
+            itWentFine = true;
         } catch (e) {
+            console.log("fel i initiateCanvas")
             console.log(e)
-            return false;
         }
-        return true;
+        return itWentFine;
     }
 
     invite(email: string): void {
@@ -130,9 +134,14 @@ export class GameHost extends Game {
 export class GameClient extends Game {
 
     constructor(gameCanvas: string, canvasID: string, authHandler: FireAuth_Handler) {
-        super(canvasID);
+        super();
+        this.canvasID = canvasID;
+
         this.painter = new Painter(gameCanvas, false)
-        this.networker = new NetworkHandler(this.painter, this.canvasID, authHandler);
+
+        this.networker = new NetworkHandler(this.painter, authHandler);
+        this.networker.canvasID = this.canvasID
+
         this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
     }
 

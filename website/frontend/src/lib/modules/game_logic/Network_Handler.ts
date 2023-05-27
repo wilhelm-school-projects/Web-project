@@ -14,11 +14,9 @@ export class NetworkHandler {
     axiosInstance: AxiosInstance;
     stopShapeRetrieval: Unsubscribe;
 
-    constructor(painter: Painter, canvasID: string, authHandler: FireAuth_Handler) {
-        this.canvasID = canvasID;
+    constructor(painter: Painter, authHandler: FireAuth_Handler) {
         this.painter = painter;
         this.authHandler = authHandler;
-        this.userEmail = this.authHandler.userCredentials?.user.email as string;
         this.userEmail = this.authHandler.userEmail
         this.database = get(databaseHandler)
         this.axiosInstance = axios.create({
@@ -64,16 +62,19 @@ export class NetworkHandler {
     }
 
     initiateShapeRetrieval() {
-        let contextPath: string = this.canvasID + '/shapes';
+        let canvasPath: string = this.canvasID + '/shapes';
         let response: Object;
-
-        this.stopShapeRetrieval = onValue(ref(this.database, contextPath), (snapshot) => {
-            let data = snapshot.val();
-            if (data === null) {
-                data = {}
-            }
-            this.painter.reloadContext(data);
-        });
+        try {
+            this.stopShapeRetrieval = onValue(ref(this.database, canvasPath), (snapshot) => {
+                let data = snapshot.val();
+                if (data === null) {
+                    data = {}
+                }
+                this.painter.reloadContext(data);
+            });
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     private async canvasIsControlled(path: string): Promise<boolean> {
@@ -157,8 +158,14 @@ export class NetworkHandler {
     }
 
     // Stuff that can't happen before mounting the game page
-    run(): void {
+    async run() {
         this.initiateShapeRetrieval()
+    }
+
+    async loadCanvasID() {
+        let canvasPath = 'users/' + encodeURIComponent(this.userEmail).replace('.', '%2E') + '/ownCanvas';
+        let response = await fireGet(ref(this.database, canvasPath))
+        this.canvasID = response.val()
     }
 
     // Requests to Cloud functions API

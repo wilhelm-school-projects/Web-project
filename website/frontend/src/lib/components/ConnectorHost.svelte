@@ -6,8 +6,9 @@
     import { GameHost } from "$lib/modules/game_logic/Game";
     import { onMount } from "svelte";
 
+    // canvasID is not choosed by host manually any more but each user gets one
+    // generated when signing up, so a bit of code to remove from here
     let canvasRoute: string = "/game/host";
-    let canvasID: string = "context-id-" + Math.round(Math.random() * 10000); // should be user input
     let game: GameHost;
     let firstClick: boolean = true;
     let authHandler: FireAuth_Handler = get(authHandlerShared);
@@ -25,12 +26,10 @@
                 throw Error("event is null");
             }
             if (firstClick) {
-                gameHandler.set(
-                    new GameHost("game-canvas", canvasID, authHandler)
-                );
+                gameHandler.set(new GameHost("game-canvas", authHandler));
                 game = get(gameHandler) as GameHost;
-                if (!(await game.canvasCreated())) {
-                    console.log("Canvas couldn't be created");
+                if (!(await game.initiateCanvas())) {
+                    console.log("Canvas couldn't be initiated");
                     return;
                 }
                 closeModal("modal-game-type");

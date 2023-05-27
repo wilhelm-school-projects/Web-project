@@ -43,6 +43,8 @@
             get(authHandlerShared).signIn(() => {
                 showModal();
             });
+            console.log("logged in user:");
+            console.log(get(authHandlerShared));
         });
 
         wrongCredentialsModal = document.getElementById(
