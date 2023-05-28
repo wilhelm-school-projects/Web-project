@@ -47,10 +47,12 @@
     <div class="row d-flex justify-content-center">
         <form class="row" action="">
             <div class="row">
-                <label class="col" for=""> Canvas Name </label>
+                <h2 class="">Here goes canvas name input.</h2>
+                <p class="text-secondary">Feature coming soon... prob not</p>
+                <!-- <label class="col" for=""> Canvas Name </label> -->
                 <!-- Use commented when done -->
                 <!-- <input class="col rounded" type="text" bind:value={canvasID} /> -->
-                <input class="col rounded" type="text" />
+                <!-- <input class="col rounded" type="text" /> -->
             </div>
             <div class="row">
                 <div class="col d-flex justify-content-center">

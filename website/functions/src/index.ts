@@ -1,9 +1,15 @@
 import * as functions from "firebase-functions";
 import { Request, Response } from 'express';
 
+// TODO:
+//  1.  Split logic into different files
+//  2.  "inviteToCanvas": check if user already exists
+//  3.  relevant status codes
+
+
 // Admin sdk
 const { initializeApp } = require('firebase-admin/app');
-const { getAuth } = require('firebase-admin/auth');
+// const { getAuth } = require('firebase-admin/auth');
 const { log } = require('firebase-functions/logger')
 const { getDatabase } = require('firebase-admin/database');
 
@@ -32,25 +38,17 @@ exports.processSignUp = functions.auth.user().onCreate(async (user) => {
     console.log(user)
 
     try {
-        // Set custom user claims on this newly created user.
-        // await getAuth().setCustomUserClaims(user.uid, customClaims);
-
         // Update real-time database to notify client to force refresh.
         // const metadataRef = getDatabase().ref('metadata/' + user.uid);
 
-        // let updates: { [key: string]: any } = {};
-        let canvasID: string = "canvas-id-" + Math.round(Math.random() * 10000);
-        console.log("canvasID")
-        console.log(canvasID)
+        let canvasID: string = "canvas-" + Math.round(Math.random() * 1000000);
         let userEmailEncoded = encodeURIComponent(user.email as string).replace('.', '%2E');
-        console.log("encoded")
-        console.log(userEmailEncoded)
-        console.log("getAuth return value: ")
-        console.log(getAuth())
+
         let newCanvas = { [canvasID]: { owner: userEmailEncoded } }
         let newUser = { [userEmailEncoded]: { ownCanvas: canvasID } }
         const rootRef = db.ref('/');
         const usersRef = db.ref('/users')
+
         // Create canvas in database
         rootRef.update(newCanvas, (error: Error) => {
             if (error) {
@@ -69,164 +67,162 @@ exports.processSignUp = functions.auth.user().onCreate(async (user) => {
             }
         })
 
-        // await claimCanvas(canvasID, user.email as string)
-        console.log("calling claimcanvas:")
-        console.log(canvasID + " " + user.email)
-        // await claimCanvas(canvasID, user.email as string)
-        claimCanvas(canvasID, user.email as string).then(() => {
+        setAllClaims(canvasID, user.email as string).then(() => {
             console.log("done with calling claimcanvas")
         }).catch((e: Error) => {
             console.log("Error in processSignUp")
             console.log(e)
         })
-        // Set user permissions to read / write to canvas. Prob do in a function
-        // so it can be used when inviting new users
-
-        // db.setRules(j)
-        // context-id-2108
-        // await getAuth().setCustomUserClaims(user.uid, {
-        //     "context-id-2108": "$user_id === auth.uid"
-        // });
-        // // Set the refresh time to the current UTC timestamp.
-        // // This will be captured on the client to force a token refresh.
-        // await metadataRef.set({ refreshTime: new Date().getTime() });
     } catch (error) {
         console.log(error);
     }
-    // } else {
-    //     log("Inte verifierad")
-    //     log(user)
-    // }
-
 });
 
-async function claimCanvas(canvasID: string, email: string) {
-    // rulesJSON.rules gives me what object I want, change to that!!
-    let rules: any;
-    rules = await db.getRulesJSON()
-    console.log("rules:")
-    console.log(rules)
-    // For some reason await doesn't work here
-    // log(await db.getRulesJSON())
-    // try {
-    //     rules = await db.getRulesJSON()
-    // } catch (e) {
-    //     console.log("getUlresJSON didnt work:")
-    //     console.log(e)
-    // }
-
-    // Get database rules
+async function setAllClaims(canvasID: string, userEmail: string) {
+    let constructedRules: any;
     db.getRulesJSON().then((rulesJSON: any) => {
-        log("(console) i then")
-        console.log(rulesJSON)
-        rules = rulesJSON
+        constructedRules = rulesJSON.rules
 
-        console.log("old rules:")
-        log(rules)
-        if (!rules.hasOwnProperty('users')) {
-            console.log("doesn't have users key")
-            rules.users = {}
-            console.log("Now it does:")
-            console.log(rules)
-        } else {
-            console.log("(console) hej den har nyckeln")
-        }
+        concatCanvasClaim(canvasID, userEmail, userEmail, constructedRules);
+        concatUserClaim(userEmail, constructedRules)
 
-        if (!rulesJSON.rules.hasOwnProperty('users')) {
-            console.log("no variable doesn't have users key")
-            rules.users = {}
-            console.log("no variable Now it does:")
-            console.log(rulesJSON.rules)
-        } else {
-            console.log("no variable it actually did have the key:")
-            console.log(rulesJSON.rules)
-        }
+        let result = { rules: constructedRules }
+        console.log("Finished rules:")
+        log(result)
+        setNewRules(result);
 
-
-        let readWrite = {
-            ".read": "true",
-            ".write": "true"
-        }
-        let encodedEmail = encodeURIComponent(email).replace('.', '%2E')
-
-        rules.users[encodedEmail] = readWrite
-        rules[canvasID] = readWrite
-        console.log("new rules:")
-        console.log(rules)
-
-        // let canvasAccessRules = {
-        //     rules: {
-        //         [canvasID]: {
-        //             ".read": "true",
-        //             ".write": "true"
-        //         },
-        //         "users": {
-        //             [encodedEmail]: {
-        //                 ".read": "true",
-        //                 ".write": "true"
-        //             }
-        //         }
-        //     }
-        // }
-        // try {
-        //     await db.setRules(rules);
-        // } catch (e) {
-        //     console.error("Error updating rules:", e);
-        // }
-        db.setRules(rules).then().catch((e: Error) => {
-            console.log("Error in setRules:", e)
-        })
-        db.getRules().then((rules: string) => {
-            console.log("After, rules in database:")
-            console.log(rules)
-        })
     }).catch((err: Error) => {
         console.log("Error in getrulesJSON:")
         console.log(err)
     })
+}
 
+async function setCanvasClaimToUser(canvasID: string, ownerEmail: string, inviteEmail: string) {
+    // Errors are being thrown correctly
+    let constructedRules: any;
+    db.getRulesJSON().then((rulesJSON: any) => {
+        constructedRules = rulesJSON.rules
+
+        concatCanvasClaim(canvasID, ownerEmail, inviteEmail, constructedRules);
+
+        let result = { rules: constructedRules }
+        console.log("(setCanvasClaimTOUser) Finished rules:")
+        log(result)
+        setNewRules(result);
+
+    }).catch((err: Error) => {
+        console.log("Error in getrulesJSON:")
+        throw err
+    })
+}
+
+async function setNewRules(newRules: any) {
+
+    db.setRules(newRules).then(() => {
+        console.log("setRules supposedly when fine?")
+    }).catch((e: Error) => {
+        console.log("Error in setRules:", e)
+    })
+    db.getRules().then((newRules: string) => {
+        console.log("After, rules in database:")
+        console.log(newRules)
+    })
+}
+
+
+
+async function concatCanvasClaim(canvasID: string, ownerEmail: string, inviteEmail: string, rules: any) {
+    console.log("inside concatCanvasClaim:")
+    console.log(inviteEmail)
+    console.log(" ")
+    console.log(ownerEmail)
+    console.log(" ")
+    console.log(canvasID)
+    console.log(" ")
+    console.log(rules)
+    let emailCondition: string;
+
+    //  True: Let inviteEmail be able to read / write on ownerEmail's canvas
+    //  False: No one owns this canvas, give read / write to ownerEmail
+    if (rules.hasOwnProperty(canvasID)) {
+        let oldEmailCondition: string = rules[canvasID]['.read'] // read / write has same condition
+        console.log("old email condition:")
+        console.log(oldEmailCondition)
+        emailCondition = oldEmailCondition + " || " + "auth.token.email === \'" + inviteEmail + "\'"
+    } else {
+        console.log("didn't have canvasID property")
+        emailCondition = "auth.token.email === " + "\'" + ownerEmail + "\'"
+    }
+    console.log("new emailCondition:")
+    console.log(emailCondition)
+
+    let readWrite = {
+        ".read": emailCondition,
+        ".write": emailCondition
+    }
+    rules[canvasID] = readWrite
+    console.log("new rules (inside concatCanvasClaim):")
+    log(rules)
+}
+
+async function concatUserClaim(userEmail: string, rules: any) {
+    console.log(userEmail)
+    console.log(" ")
+    console.log(rules)
+    if (!rules.hasOwnProperty('users')) {
+        console.log("doesn't have users key")
+        rules.users = {}
+        console.log("Now it does:")
+        log(rules)
+    } else {
+        console.log("(console) hej den har nyckeln")
+        log(rules)
+    }
+    let encodedEmail = encodeURIComponent(userEmail).replace('.', '%2E')
+    let emailCondition = "auth.token.email === " + "\'" + userEmail + "\'"
+    let readWrite = {
+        ".read": emailCondition,
+        ".write": emailCondition
+    }
+    rules.users[encodedEmail] = readWrite
 }
 
 // should get in body: email, canvas id 
-app.post('/claimReadWriteToCanvas', async (req: Request, res: Response) => {
-
+app.post('/inviteUserToCanvas', async (req: Request, res: Response) => {
+    // fetchSignInMethodsForEmail
+    // add user claims to canvas
+    // add canvas id to participations
+    console.log("inside inviteUserToCanvas")
     let data = req.body;
-    // log("request body:")
-    log(data.userEmail)
-    log(data.canvasID)
-    // async?
-    await claimCanvas(data.canvasID, data.userEmail)
-    // const claims = await getAuth().verifyIdToken(data.userID);
-    // log("claims variable:")
-    // log(claims)
-
-    // // Add custom claims for additional privileges.
-    // await getAuth().setCustomUserClaims(claims.sub, {
-    //     canvasID: true
-    // });
-
-    // let response = { success: "Canvas created" }
-    // res.status(201).send(response);
-    // // res.status(400).send(response); Deal with this logic
-    // // Verify the ID token and decode its payload.
-
-    // // Verify user is eligible for additional privileges.
-    // if (
-    //     typeof claims.email !== 'undefined' &&
-    //     typeof claims.email_verified !== 'undefined' &&
-    //     claims.email_verified &&
-    //     claims.email.endsWith('@admin.example.com')
-    // ) {
-
-    //     // Tell client to refresh token on user.
-    //     res.end(JSON.stringify({
-    //         status: 'success'
-    //     }));
-    // } else {
-    //     // Return nothing.
-    //     res.end(JSON.stringify({ status: 'ineligible' }));
-    // }
+    console.log(data.ownerEmail)
+    console.log(" ")
+    console.log(data.inviteEmail)
+    console.log(" ")
+    console.log(data.canvasID)
+    try {
+        // await expandCanvasParticipationList(data.canvasID, data.inviteEmail)
+        await setCanvasClaimToUser(data.canvasID, data.ownerEmail, data.inviteEmail)
+        res.status(201).send("User is invited to canvas")
+        return; // necessary?
+    } catch (e) {
+        res.status(400).send("Something went wrong in the server")
+        return;
+    }
 
 })
+
+// TODO: Not done or used yet 
+// async function expandCanvasParticipationList(canvasID: string, userEmail: string) {
+//     console.log("expand canvas participation:")
+//     let encodedEmail = encodeURIComponent(userEmail).replace('.', '%2E')
+//     let userPath = '/users/' + encodedEmail;
+//     console.log(encodedEmail)
+//     console.log(userPath)
+
+//     const userRef = db.ref(userPath)
+//     //  get list of canvas participations
+//     //  concat this new canvasID
+//     //  send update to db
+// }
 
 exports.api = functions.https.onRequest(app);

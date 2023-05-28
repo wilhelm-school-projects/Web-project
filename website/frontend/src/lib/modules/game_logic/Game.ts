@@ -5,17 +5,20 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import type { FireAuth_Handler } from '../stores';
 
 //TODO:
-//  1.  Same as 4. but create a canvas in database for every newly created user
-//      and let that user get read / write privilages.
-//  4.  logic to connect / initate new canvas
-//      - initiate canvas -> invite email to canvas
-//  5.  ^logic on server side
 //  7.  Clear canvas
 //  8.  Refreshing the page should not cause the person to log out or loose
 //      connection to current canvas. Low priority
 //  9.  use logged in user email instead of localstorage (see network)
-//  10. Set custom name to canvas so it is not required to invite with the generated canvas id
-//  11. (inside connector(Host/Client) change so the constructor load canvas id and throws error if not successful)
+//  10. Set custom name to canvas so it is not required to invite with the
+//      generated canvas id
+//  11. (inside connector(Host/Client) change so the constructor load canvas id
+//      and throws error if not successful)
+//  12. Refactor whole code base and make it make more sense
+//  13. Don't force move user to /home even if email/password was wrong or
+//      didn't exist
+//  14. bug when creating 2 users with short interval, only the last user's
+//      rules get applied since the first user's rules hasn't had the time to be
+//      applied before second user fetches these rules before.
 
 export class Game {
     // Might not need to save canvasID in Game
@@ -125,9 +128,13 @@ export class GameHost extends Game {
         return itWentFine;
     }
 
-    invite(email: string): void {
+    async inviteUserToCanvas(email: string) {
         console.log("(inside GameHost) inviting email: ")
         console.log(email)
+        if (!validEmail(email)) {
+            throw Error("Email is not valid: " + email)
+        }
+        await this.networker.inviteEmailToCanvas(email)
     }
 }
 
@@ -156,3 +163,17 @@ export class GameClient extends Game {
         this.initTransmissions();
     }
 }
+
+
+function validEmail(email: string): boolean {
+    if (
+        String(email)
+            .toLowerCase()
+            .match(
+                /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+            ) === null
+    ) {
+        return false;
+    }
+    return true;
+};

@@ -154,6 +154,7 @@ export class NetworkHandler {
 
     async removeCanvasControl() {
         let controlPath = this.canvasID + '/control'
+        console.log("jag tar bort den")
         await remove(ref(this.database, controlPath));
     }
 
@@ -162,6 +163,7 @@ export class NetworkHandler {
         this.initiateShapeRetrieval()
     }
 
+
     async loadCanvasID() {
         let canvasPath = 'users/' + encodeURIComponent(this.userEmail).replace('.', '%2E') + '/ownCanvas';
         let response = await fireGet(ref(this.database, canvasPath))
@@ -169,23 +171,39 @@ export class NetworkHandler {
     }
 
     // Requests to Cloud functions API
-    async setUserCanvasClaims(): Promise<boolean> {
-        console.log("auth handle i set canvas claims")
-        console.log(this.authHandler)
-        return new Promise(async (resolve, reject) => {
-            try {
-                let response = await this.axiosInstance.post('/setUserClaimsNewCanvas', {
-                    userID: this.authHandler.userCredentials?.user.uid,
-                    canvasID: this.canvasID
-                })
-                console.log("setuserclaims response:")
-                console.log(response)
-            } catch (e) {
-                console.log(e)
-                reject(false)
-                return
-            }
-            resolve(true)
-        })
+    async inviteEmailToCanvas(inviteEmail: string) {
+        console.log("doing request")
+        try {
+
+            let response = await this.axiosInstance.post('/inviteUserToCanvas', {
+                ownerEmail: this.userEmail,
+                inviteEmail: inviteEmail,
+                canvasID: this.canvasID
+            })
+            console.log("response from inviteUserToCanvas:")
+            console.log(response)
+        } catch (e) {
+            console.log("Error in requesting to inviate email to canvas")
+            console.log(e)
+        }
     }
+    // async setUserCanvasClaims(): Promise<boolean> {
+    //     console.log("auth handle i set canvas claims")
+    //     console.log(this.authHandler)
+    //     return new Promise(async (resolve, reject) => {
+    //         try {
+    //             let response = await this.axiosInstance.post('/setUserClaimsNewCanvas', {
+    //                 userID: this.authHandler.userCredentials?.user.uid,
+    //                 canvasID: this.canvasID
+    //             })
+    //             console.log("setuserclaims response:")
+    //             console.log(response)
+    //         } catch (e) {
+    //             console.log(e)
+    //             reject(false)
+    //             return
+    //         }
+    //         resolve(true)
+    //     })
+    // }
 }

@@ -130,6 +130,7 @@ export class FireAuth_Handler {
         return false;
     }
 
+    // Probably shouldn't be async
     async validEmail(): Promise<boolean> {
         if (
             String(this.userEmail)

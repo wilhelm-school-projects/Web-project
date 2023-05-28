@@ -6,14 +6,15 @@
     let inviteEmail: string = "Email to invite";
     let game: GameHost = get(gameHandler) as GameHost;
 
-    function invite() {
-        console.log("Invite Email:");
-        console.log(inviteEmail);
-
-        console.log("game object inside invitemodule:");
-        console.log(game);
-
-        game.invite(inviteEmail);
+    async function invite() {
+        try {
+            await game.inviteUserToCanvas(inviteEmail);
+            // Let user know inviting was successful (more than emptying input)
+            inviteEmail = "";
+        } catch (e) {
+            console.log("Error when inviting: ");
+            console.log(e);
+        }
     }
 </script>
 
@@ -28,6 +29,7 @@
 <input
     type="email"
     class="col text-secondary input-outline-danger"
+    on:focus={() => (inviteEmail = "")}
     bind:value={inviteEmail}
 />
 

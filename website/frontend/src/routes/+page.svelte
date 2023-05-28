@@ -3,7 +3,7 @@
     import { slide, fade } from "svelte/transition";
     import { authHandlerShared } from "$lib/modules/stores";
     import { get } from "svelte/store";
-    import { goto } from "$app/navigation";
+    import axios from "axios";
 
     //"FirebaseUI is not compatiable with Firebase SDk v9.0.0+ for now, currently it
     //is still dependent on Firebase v8. We're working on it right now, you can see

@@ -1,6 +1,6 @@
 import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
 import type { NetworkHandler } from '$lib/modules/game_logic/Network_Handler'
-import { type Game, GameHost, GameClient } from '$lib/modules/game_logic/Game'
+import type { Game } from '$lib/modules/game_logic/Game'
 // import styles from '$lib/modules/game_logic/animations.css?inline'
 
 export class SettingsHandler {
