@@ -1,26 +1,16 @@
 # functionality:
-A website to handle the monitoring of embankment pumps at the field of the
-farmer (this part is not done yet, is part of my bachelor thesis). Its main
-purpose is to display if a given pump is active or not, show current water
-level, and the history of this in the form of graphs. As this may be a rather
-static webapp, e.g., a settings page will be added to be able to change
-parameters. Also users have to sign in using oauth. This will be developed with
-the assumption that the user browse this app on his/her phone most of the time.
+It is a web app whose purpose from the beginning was to display the monitoring of embankment pumps in agriculture. However, as that would been alot of user interactivity I chose to do a "mini game" which at this stage is the whole app, and will be. The "game" is to draw in real time on a shared canvas.
 
-1. (almost) real-time Graphs displaying data collected at the embankment pumps
-   (mock data has to be made)
-1. websockets to update the graphs 
-1. settings (name, profile icon, age, etc.)
-1. Sign in / log-out
-1. add / delete monitoring of a pump
-1. Dark mode
-1. Use https
-1. Multiple languages
 
 # tech stack:
+   1. Sveltekit: Svelte, Vite, file structure for routing.
+   2. Typescript
+   3. Bootstrap
+   4. Expressjs
+   5. Firebase: Authentication, Real time database (using rules in a somewhat okey way), Admin SDK, Hosting 
 
 ## Front-end 
-Svelte, Typescript, Oauth 2.0, Boostrap
+Sveltekit, Typescript, , Boostrap
 
 ## Back-end 
 Expressjs (Typescript if possible), mysql

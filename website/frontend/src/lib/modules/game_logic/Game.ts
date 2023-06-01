@@ -5,6 +5,8 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import type { FireAuth_Handler } from '../stores';
 
 //TODO:
+//  1.  Release control of canvas when logging out. Should be able to do with
+//      the firebase onStateChange thingy.
 //  7.  Clear canvas
 //  8.  Refreshing the page should not cause the person to log out or loose
 //      connection to current canvas. Low priority
@@ -25,6 +27,7 @@ import type { FireAuth_Handler } from '../stores';
 //  15. Change database rules so it follows the example Martin showed.
 //  16. Make coordinates relative to your screen size. Alternative, make the
 //      canvas "infinite" and scrollable (like drawio)
+//  17. When signing up transition to /home page automatically
 
 export class Game {
     // Might not need to save canvasID in Game

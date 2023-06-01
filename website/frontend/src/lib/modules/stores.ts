@@ -90,10 +90,6 @@ export class FireAuth_Handler {
     async signOut() {
         try {
             let response = await signOutFire(this.fireAuth)
-
-            // Force user to go to index even if it wasn't logged in on the
-            // current page. onAuthStateChange doesn't trigger if there isn't
-            // any user logged in 
             goto('/')
         } catch (e) {
             console.log(e)

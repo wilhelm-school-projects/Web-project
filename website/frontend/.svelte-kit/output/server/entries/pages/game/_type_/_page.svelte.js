@@ -181,6 +181,8 @@ class Painter {
       }
     }
   }
+  // TODO: Probably a good idea to not erase it all, but only what is needed
+  // (low priority)
   reloadContext(incomingShapes) {
     this.gamectx.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
     this.shapes = { rectangles: [], circles: [] };
@@ -523,14 +525,12 @@ class GameHost extends Game {
       console.log(this.networker.canvasID);
       itWentFine = true;
     } catch (e) {
-      console.log("fel i initiateCanvas");
+      console.log("Fault in initiateCanvas:");
       console.log(e);
     }
     return itWentFine;
   }
   async inviteUserToCanvas(email) {
-    console.log("(inside GameHost) inviting email: ");
-    console.log(email);
     if (!validEmail(email)) {
       throw Error("Email is not valid: " + email);
     }

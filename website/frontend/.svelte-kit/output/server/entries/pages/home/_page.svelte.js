@@ -29,12 +29,8 @@ const ConnectorClient = create_ssr_component(($$result, $$props, $$bindings, slo
 });
 const ConnectorHost = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   get_store_value(authHandlerShared);
-  return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><h2 class="">Here goes canvas name input.</h2>
-                <p class="text-secondary">Feature coming soon... prob not</p>
-                
-                
-                
-                </div>
+  return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><h2 class=""></h2>
+                <p class="text-secondary"></p></div>
             <div class="row"><div class="col d-flex justify-content-center"><a id="anchor-game-host" class="col text-center btn btn-outline-secondary" href="">Host
                     </a></div></div></form></div></main>`;
 });
