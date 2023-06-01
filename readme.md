@@ -1,5 +1,5 @@
 # functionality:
-It is a web app whose purpose from the beginning was to display the monitoring of embankment pumps in agriculture. However, as that would been alot of user interactivity I chose to do a "mini game" which at this stage is the whole app, and will be. The "game" is to draw in real time on a shared canvas.
+It is a web app whose purpose from the beginning was to display the monitoring of embankment pumps in agriculture. However, as that would been lacking alot of user interactivity I chose to do a "mini game" which at this stage is the whole app, and will be. The "game" is to draw in real time on a shared canvas.
 
 
 # tech stack:
