@@ -8,12 +8,3 @@ It is a web app whose purpose from the beginning was to display the monitoring o
    3. Bootstrap
    4. Expressjs
    5. Firebase: Authentication, Real time database (using rules in a somewhat okey way), Admin SDK, Hosting 
-
-## Front-end 
-Sveltekit, Typescript, , Boostrap
-
-## Back-end 
-Expressjs (Typescript if possible), mysql
-
-## Dev tools
-nodemon(?), Vite (Kör live server för svelte och bygger projekt),
