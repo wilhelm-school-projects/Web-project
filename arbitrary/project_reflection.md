@@ -11,6 +11,7 @@ inte varit jätteintressant faktiskt.
 
 visa "git lgb"
 
+Screencast software: recordMyDesktop
 
 # tech stack:
    1. Sveltekit, consists of: (1) The language svelte which compiles to optimized javascript/html/css, (2) Vite which is used to run a live server hosting the web app and doing hot updates when doing changes to the code. It is also used to build the website. (3) sveltekit opposed to just svelte, also has a particular file structure to follow for the routing so you almost get that "for free". In constrast to other frameworks like React, Svelte doesn't use a virtual DOM and instead produces javascript at compile to which will change the real DOM when e.g., a value which an element is dependant on changes. As I have zero experience myself with virtual DOM I have limited understanding of it and why it would be needed at all, if one uses Svelte's approach. Some suggestions online are that it is easy to manage large scale projects with VDOM.   
