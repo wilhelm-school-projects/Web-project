@@ -51,6 +51,7 @@ class FireAuth_Handler {
       );
     } catch (e) {
       errorHandler();
+      console.log("felfelfel:");
       console.log(e);
     }
     this.unsubscribeAuthStateChange = onAuthStateChanged(this.fireAuth, (user) => {
@@ -96,6 +97,7 @@ class FireAuth_Handler {
     }
     return false;
   }
+  // Probably shouldn't be async
   async validEmail() {
     if (String(this.userEmail).toLowerCase().match(
       /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/

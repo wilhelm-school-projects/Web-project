@@ -107,7 +107,6 @@ export class Painter {
         this.controlsCanvas = controlsCanvas
         this.gameCanvasString = gameCanvas
 
-        // Shapes and stuff
         this.shapes = { rectangles: [], circles: [] };
         this.currentShape = "circle";
         this.oldLengths = { rectangles: 0, circles: 0 }
@@ -149,7 +148,7 @@ export class Painter {
     async updateHasPainted() {
         let hasPainted: boolean = false;
 
-        // Simple way of checking, should be more sophisticated
+        //TODO: Simple way of checking, should be more sophisticated
         for (const key of Object.keys(this.shapes)) {
             if (this.shapes[key].length !== this.oldLengths[key]) {
                 hasPainted = true;
@@ -221,6 +220,8 @@ export class Painter {
         }
     }
 
+    // TODO: Probably a good idea to not erase it all, but only what is needed
+    // (low priority)
     reloadContext(incomingShapes: { [key: string]: any }): void {
         this.gamectx.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
 

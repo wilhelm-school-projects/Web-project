@@ -20,20 +20,21 @@ const NavbarHome = create_ssr_component(($$result, $$props, $$bindings, slots) =
 </nav>`;
 });
 const ConnectorClient = create_ssr_component(($$result, $$props, $$bindings, slots) => {
+  let canvasID = "";
   get_store_value(authHandlerShared);
   return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><label class="col" for="">Canvas Name </label>
-                
-                
-                <input class="col rounded" type="text"></div>
+                <input class="col rounded" type="text"${add_attribute("value", canvasID, 0)}></div>
             <div class="row"><div class="col d-flex justify-content-center"><a id="anchor-game-client" class="col text-center btn btn-outline-secondary" href="">Connect
                     </a></div></div></form></div></main>`;
 });
 const ConnectorHost = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   get_store_value(authHandlerShared);
-  return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><label class="col" for="">Canvas Name </label>
+  return `<main><div class="row d-flex justify-content-center"><form class="row" action=""><div class="row"><h2 class="">Here goes canvas name input.</h2>
+                <p class="text-secondary">Feature coming soon... prob not</p>
                 
                 
-                <input class="col rounded" type="text"></div>
+                
+                </div>
             <div class="row"><div class="col d-flex justify-content-center"><a id="anchor-game-host" class="col text-center btn btn-outline-secondary" href="">Host
                     </a></div></div></form></div></main>`;
 });

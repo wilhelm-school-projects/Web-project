@@ -1,4 +1,4 @@
-import { Rectangle, Circle, Painter } from '$lib/modules/game_logic/Painting_Handler'
+import { Painter } from '$lib/modules/game_logic/Painting_Handler'
 import { SettingsHandler } from '$lib/modules/game_logic/Settings_Handler'
 import { NetworkHandler } from '$lib/modules/game_logic/Network_Handler'
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
@@ -8,17 +8,23 @@ import type { FireAuth_Handler } from '../stores';
 //  7.  Clear canvas
 //  8.  Refreshing the page should not cause the person to log out or loose
 //      connection to current canvas. Low priority
-//  9.  use logged in user email instead of localstorage (see network)
 //  10. Set custom name to canvas so it is not required to invite with the
 //      generated canvas id
-//  11. (inside connector(Host/Client) change so the constructor load canvas id
-//      and throws error if not successful)
+//  11. Make errors when loading canvas, inviting email, etc. user friendly so
+//      it is easy to understand what is going on.
 //  12. Refactor whole code base and make it make more sense
 //  13. Don't force move user to /home even if email/password was wrong or
 //      didn't exist
 //  14. bug when creating 2 users with short interval, only the last user's
 //      rules get applied since the first user's rules hasn't had the time to be
 //      applied before second user fetches these rules before.
+//
+//      This will probably be solved using the other way to add read/write to
+//      users. (see below)
+//
+//  15. Change database rules so it follows the example Martin showed.
+//  16. Make coordinates relative to your screen size. Alternative, make the
+//      canvas "infinite" and scrollable (like drawio)
 
 export class Game {
     // Might not need to save canvasID in Game
@@ -36,17 +42,18 @@ export class Game {
     }
 
     async transmitShapes() {
-        // Fix logic for this some time
+        // TODO: "stoppedPaintingJustNow" doesn't do anything at the moment. It
+        // is meant to capture final changes made to the canvas before clicking
+        // "draw" to disable control. Thus making these final changes possible
+        // not being transmitted.
         if (this.painter.stoppedPaintingJustNow) {
             this.painter.stoppedPaintingJustNow = false;
             return;
         }
-        // If an existing canvas is being connected to, the load of it needs to
-        // happen before this so there is no risk of sending an empty canvas to
-        // the backend and thus overwriting it. This should logic probably differs from host and client
         if (!this.painter.controlsCanvas || !this.painter.hasPainted) {
             return;
         }
+
         this.painter.hasPainted = false; // transmitting changes, thus hasn't painted anything from now on
         let message = this.painter.getShapes();
         try {
@@ -71,7 +78,6 @@ export class Game {
 
     // Stuff that can't happen before mounting the game page
     run(): void {
-        // console.log("initCanvas")
     }
 
     cleanUp(): void {
@@ -122,15 +128,13 @@ export class GameHost extends Game {
             console.log(this.networker.canvasID)
             itWentFine = true;
         } catch (e) {
-            console.log("fel i initiateCanvas")
+            console.log("Fault in initiateCanvas:")
             console.log(e)
         }
         return itWentFine;
     }
 
     async inviteUserToCanvas(email: string) {
-        console.log("(inside GameHost) inviting email: ")
-        console.log(email)
         if (!validEmail(email)) {
             throw Error("Email is not valid: " + email)
         }
@@ -152,9 +156,8 @@ export class GameClient extends Game {
         this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
     }
 
-    // Stuff that can't happen before mounting the game page Order of method
-    // calls is important because some objects need to run before to initialize
-    // som stuff other objects need
+    // Order of method calls is important because some objects need to run
+    // before others, to initialize som stuff other objects need
     run(): void {
         console.log("Client: running game")
         this.settingsHandler.run();
@@ -165,6 +168,8 @@ export class GameClient extends Game {
 }
 
 
+// TODO: Put functions as this in a "help_functions" file, so it can be shared
+// all over the app
 function validEmail(email: string): boolean {
     if (
         String(email)

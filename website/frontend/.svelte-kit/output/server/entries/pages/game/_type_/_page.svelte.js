@@ -11,7 +11,7 @@ const InviteModule = create_ssr_component(($$result, $$props, $$bindings, slots)
   return `
 <button id="button-invite" class="col text-white bg-danger btn btn-primary btn-outline-secondary">Invite
 </button>
-<input type="email" class="col text-secondary btn-outline-danger"${add_attribute("value", inviteEmail, 0)}>
+<input type="email" class="col text-secondary input-outline-danger"${add_attribute("value", inviteEmail, 0)}>
 
 `;
 });
@@ -246,15 +246,12 @@ class SettingsHandler {
       "canvas-wrapper"
     );
     this.drawButton = document.getElementById("button-Draw-drawing-pane");
-    if (this.game instanceof GameClient) {
-      let canvasWrapper = document.getElementById(
-        "canvas-wrapper"
-      );
-      canvasWrapper.style.pointerEvents = "none";
-      canvasWrapper.style.cursor = "not-allowed";
-    }
-    let drawButton = document.getElementById("button-Draw-drawing-pane");
-    drawButton.addEventListener("click", async () => {
+    let canvasWrapper = document.getElementById(
+      "canvas-wrapper"
+    );
+    canvasWrapper.style.pointerEvents = "none";
+    canvasWrapper.style.cursor = "not-allowed";
+    this.drawButton.addEventListener("click", async () => {
       if (this.painter.controlsCanvas) {
         this.lockCanvas();
         await this.Networker.removeCanvasControl();
@@ -263,22 +260,27 @@ class SettingsHandler {
       }
     });
   }
+  drawButtonGreen() {
+    this.drawButton.style.backgroundColor = "green";
+  }
 }
 class NetworkHandler {
   painter;
   database;
   canvasID;
+  userEmail;
   authHandler;
   axiosInstance;
   stopShapeRetrieval;
-  constructor(painter, canvasID, authHandler) {
-    this.canvasID = canvasID;
+  constructor(painter, authHandler) {
     this.painter = painter;
     this.authHandler = authHandler;
+    this.userEmail = this.authHandler.userEmail;
     this.database = get_store_value(databaseHandler);
     this.axiosInstance = axios.create({
-      // baseURL: 'https://us-central1-montem-d8829.cloudfunctions.net/api'
-      baseURL: "http://localhost:5000/montem-d8829/us-central1/api"
+      baseURL: "https://us-central1-montem-d8829.cloudfunctions.net/api"
+      // prod
+      // baseURL: 'http://localhost:5000/montem-d8829/us-central1/api',   // dev
     });
   }
   async updateShapes(message) {
@@ -316,14 +318,18 @@ class NetworkHandler {
     await set(ref(this.database, path), message);
   }
   initiateShapeRetrieval() {
-    let contextPath = this.canvasID + "/shapes";
-    this.stopShapeRetrieval = onValue(ref(this.database, contextPath), (snapshot) => {
-      let data = snapshot.val();
-      if (data === null) {
-        data = {};
-      }
-      this.painter.reloadContext(data);
-    });
+    let canvasPath = this.canvasID + "/shapes";
+    try {
+      this.stopShapeRetrieval = onValue(ref(this.database, canvasPath), (snapshot) => {
+        let data = snapshot.val();
+        if (data === null) {
+          data = {};
+        }
+        this.painter.reloadContext(data);
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
   async canvasIsControlled(path) {
     try {
@@ -358,18 +364,14 @@ class NetworkHandler {
   }
   async requestCanvasControl() {
     return new Promise(async (resolve, reject) => {
-      let userEmail = localStorage.getItem("email");
-      if (userEmail === null) {
-        reject("(reuquestCanvasControl) user email doens't exist in localstorage");
-        return;
-      }
-      userEmail = encodeURIComponent(userEmail).replace(".", "%2E");
+      let userEmailEncoded;
+      userEmailEncoded = encodeURIComponent(this.userEmail).replace(".", "%2E");
       let controlPath = this.canvasID + "/control";
       if (await this.canvasIsControlled(controlPath)) {
         reject("(requestCanvasControl) canvas is being controlled by someone else");
         return;
       }
-      await this.sendUpdate(userEmail, controlPath);
+      await this.sendUpdate(userEmailEncoded, controlPath);
       try {
         let response = await get(ref(this.database, controlPath));
         if (!response.exists()) {
@@ -377,7 +379,7 @@ class NetworkHandler {
           return;
         }
         let email = response.val();
-        if (email !== userEmail) {
+        if (email !== userEmailEncoded) {
           reject("Another user controls the canvas");
           return;
         }
@@ -390,38 +392,62 @@ class NetworkHandler {
   }
   async removeCanvasControl() {
     let controlPath = this.canvasID + "/control";
+    console.log("jag tar bort den");
     await remove(ref(this.database, controlPath));
   }
   // Stuff that can't happen before mounting the game page
-  run() {
+  async run() {
     this.initiateShapeRetrieval();
   }
-  // Requests to Cloud functions API
-  async setUserCanvasClaims() {
-    console.log("auth handle i set canvas claims");
-    console.log(this.authHandler);
-    return new Promise(async (resolve, reject) => {
-      try {
-        let response = await this.axiosInstance.post("/setUserClaimsNewCanvas", {
-          canvasID: this.canvasID
-        });
-      } catch (e) {
-        console.log(e);
-        reject(false);
-        return;
-      }
-      resolve(true);
-    });
+  async loadCanvasID() {
+    let canvasPath = "users/" + encodeURIComponent(this.userEmail).replace(".", "%2E") + "/ownCanvas";
+    let response = await get(ref(this.database, canvasPath));
+    this.canvasID = response.val();
   }
+  // Requests to Cloud functions API
+  async inviteEmailToCanvas(inviteEmail) {
+    console.log("doing request");
+    try {
+      let response = await this.axiosInstance.post("/inviteUserToCanvas", {
+        ownerEmail: this.userEmail,
+        inviteEmail,
+        canvasID: this.canvasID
+      });
+      console.log("response from inviteUserToCanvas:");
+      console.log(response);
+    } catch (e) {
+      console.log("Error in requesting to inviate email to canvas");
+      console.log(e);
+    }
+  }
+  // async setUserCanvasClaims(): Promise<boolean> {
+  //     console.log("auth handle i set canvas claims")
+  //     console.log(this.authHandler)
+  //     return new Promise(async (resolve, reject) => {
+  //         try {
+  //             let response = await this.axiosInstance.post('/setUserClaimsNewCanvas', {
+  //                 userID: this.authHandler.userCredentials?.user.uid,
+  //                 canvasID: this.canvasID
+  //             })
+  //             console.log("setuserclaims response:")
+  //             console.log(response)
+  //         } catch (e) {
+  //             console.log(e)
+  //             reject(false)
+  //             return
+  //         }
+  //         resolve(true)
+  //     })
+  // }
 }
 class Game {
+  // Might not need to save canvasID in Game
   canvasID;
   painter;
   settingsHandler;
   networker;
   intervalAsyncTimer;
-  constructor(canvasID) {
-    this.canvasID = canvasID;
+  constructor() {
     window.onbeforeunload = () => {
       this.cleanUp();
     };
@@ -472,56 +498,52 @@ class Game {
   }
 }
 class GameHost extends Game {
-  constructor(gameCanvas, canvasID, authHandler) {
-    super(canvasID);
-    this.painter = new Painter(gameCanvas, true);
-    this.networker = new NetworkHandler(this.painter, this.canvasID, authHandler);
+  constructor(gameCanvas, authHandler) {
+    super();
+    this.painter = new Painter(gameCanvas, false);
+    this.networker = new NetworkHandler(this.painter, authHandler);
     this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
   }
   // Stuff that can't happen before mounting the game page
-  run() {
+  async run() {
     console.log("Host: running game");
     this.settingsHandler.run();
     this.painter.run();
+    await this.networker.loadCanvasID();
     this.networker.run();
     this.initTransmissions();
   }
-  async canvasCreated() {
-    if (await this.canvasExists()) {
-      console.log("canvas already exists");
-      return false;
-    }
+  async initiateCanvas() {
+    let itWentFine = false;
     try {
-      await this.networker.requestCanvasControl();
-      await this.networker.setUserCanvasClaims();
+      await this.networker.loadCanvasID();
+      this.canvasID = this.networker.canvasID;
+      console.log(this.canvasID);
+      console.log(" ");
+      console.log(this.networker.canvasID);
+      itWentFine = true;
     } catch (e) {
+      console.log("fel i initiateCanvas");
       console.log(e);
-      return false;
     }
-    return true;
+    return itWentFine;
   }
-  invite(email) {
+  async inviteUserToCanvas(email) {
     console.log("(inside GameHost) inviting email: ");
     console.log(email);
+    if (!validEmail(email)) {
+      throw Error("Email is not valid: " + email);
+    }
+    await this.networker.inviteEmailToCanvas(email);
   }
 }
-class GameClient extends Game {
-  constructor(gameCanvas, canvasID, authHandler) {
-    super(canvasID);
-    this.painter = new Painter(gameCanvas, false);
-    this.networker = new NetworkHandler(this.painter, this.canvasID, authHandler);
-    this.settingsHandler = new SettingsHandler(this.painter, this.networker, this);
+function validEmail(email) {
+  if (String(email).toLowerCase().match(
+    /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+  ) === null) {
+    return false;
   }
-  // Stuff that can't happen before mounting the game page Order of method
-  // calls is important because some objects need to run before to initialize
-  // som stuff other objects need
-  run() {
-    console.log("Client: running game");
-    this.settingsHandler.run();
-    this.painter.run();
-    this.networker.run();
-    this.initTransmissions();
-  }
+  return true;
 }
 const NavbarGame_svelte_svelte_type_style_lang = "";
 const css$1 = {
@@ -547,11 +569,13 @@ const css = {
 const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $page, $$unsubscribe_page;
   $$unsubscribe_page = subscribe(page, (value) => $page = value);
+  let displayCanvasID = "";
   let gameType = $page.url.href.split("/").at($page.url.href.split("/").length - 1);
   $$result.css.add(css);
   $$unsubscribe_page();
   return `<main class="game-container">${validate_component(NavbarGame, "NavbarGame").$$render($$result, {}, {}, {})}
-	<div class="row"><h1 class="text-center col">${escape(gameType)}</h1></div>
+	<div class="row">
+		<h4 class="text-center col">${escape(gameType)}, canvas ID: ${escape(displayCanvasID)}</h4></div>
 	<div id="canvas-wrapper" class="row"><canvas id="game-canvas" class="svelte-oj7mwg"></canvas></div>
 </main>`;
 });
