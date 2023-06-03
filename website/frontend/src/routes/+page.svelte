@@ -37,6 +37,8 @@
             get(authHandlerShared).signUp(() => {
                 showModal();
             });
+            userEmail = "";
+            password = "";
         });
 
         signInBtn.addEventListener("click", async () => {
