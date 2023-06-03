@@ -1,7 +1,5 @@
 import { readable, writable } from 'svelte/store'
 
-export const CONTEXTID = readable("context-id-1");
-
 // Drawing game related stores
 export const gameHandler = writable()
 

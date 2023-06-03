@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
     import { slide, fade } from "svelte/transition";
     import { authHandlerShared } from "$lib/modules/stores";
     import { get } from "svelte/store";
-    import axios from "axios";
 
     //"FirebaseUI is not compatiable with Firebase SDk v9.0.0+ for now, currently it
     //is still dependent on Firebase v8. We're working on it right now, you can see
@@ -60,7 +59,6 @@
     }
 
     onMount(async () => {
-        localStorage.setItem("email", "pinto@pinto.se");
         initiateHTMLElements();
     });
 </script>

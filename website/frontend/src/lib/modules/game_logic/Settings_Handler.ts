@@ -1,7 +1,6 @@
 import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
 import type { NetworkHandler } from '$lib/modules/game_logic/Network_Handler'
 import type { Game } from '$lib/modules/game_logic/Game'
-// import styles from '$lib/modules/game_logic/animations.css?inline'
 
 export class SettingsHandler {
     painter: Painter;
@@ -67,16 +66,11 @@ export class SettingsHandler {
         ) as HTMLDivElement;
         this.drawButton = document.getElementById("button-Draw-drawing-pane") as HTMLElement;
 
-        // if (this.game instanceof GameClient) {
         let canvasWrapper = document.getElementById(
             "canvas-wrapper"
         ) as HTMLDivElement;
         canvasWrapper.style.pointerEvents = "none";
         canvasWrapper.style.cursor = "not-allowed";
-
-        // } else {
-        //     this.drawButtonGreen()
-        // }
 
         // Initiate button Event listeners
         // let drawButton = document.getElementById('button-Draw-drawing-pane') as HTMLButtonElement;

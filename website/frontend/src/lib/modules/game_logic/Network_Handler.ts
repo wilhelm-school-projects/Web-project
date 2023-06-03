@@ -3,7 +3,7 @@ import { get } from 'svelte/store'
 import { type FireAuth_Handler, databaseHandler } from '$lib/modules/stores'
 import type { Painter } from '$lib/modules/game_logic/Painting_Handler'
 import { ref, set, update, onValue, get as fireGet, remove, type Unsubscribe, type Database } from "firebase/database";
-import axios, { isCancel, AxiosError, type AxiosInstance } from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 
 export class NetworkHandler {
     painter: Painter;
