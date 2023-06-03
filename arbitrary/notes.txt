@@ -1,3 +1,0 @@
-Svelte + Vite:
-    1. Kör logged_in/not_logged_in, peka om vilket App.svelte som ska användas i
-    main.ts.
