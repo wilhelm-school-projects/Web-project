@@ -6,7 +6,7 @@ It is a web app whose purpose from the beginning was to display the monitoring o
 
 # tech stack:
    1. Sveltekit: Svelte, Vite, file structure for routing.
-   2. Typescript
+   2. Javascript/Typescript
    3. Bootstrap
    4. Expressjs
    5. Firebase: Authentication, Real time database (using rules in a somewhat okey way), Admin SDK, Hosting 
